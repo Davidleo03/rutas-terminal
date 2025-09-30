@@ -5,7 +5,7 @@ import Home from '../pages/Home'
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>Home</div>
+    element: <Home />
   },
   {
     path: "/about",
@@ -17,7 +17,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/home",
-    element: <Home />
+    element: <h2>Home</h2>
   }
 ])
 
