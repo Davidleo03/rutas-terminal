@@ -20,9 +20,14 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo y Brand */}
             <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-xl font-bold">MiApp</h1>
-              </div>
+                        <div className="flex-shrink-0 flex items-center gap-2">
+                          <img
+                            src="https://img.freepik.com/vector-premium/estacion-autobuses-interurbanos-terminal-espera-transporte-pasajeros-ilustracion-vectorial_333239-550.jpg"
+                            alt="Logo"
+                            className="w-10 h-10 rounded-full object-cover border-2 border-blue-600 shadow-md bg-white"
+                          />
+                          <span className="text-2xl font-bold text-gray-800 dark:text-white hidden sm:inline">Terminal SJ</span>
+                        </div>
               
               {/* Navigation Links - Desktop */}
               <div className="hidden md:block ml-10">
@@ -88,7 +93,7 @@ const Navbar = () => {
         {/* Sidebar Panel */}
         <div className="fixed inset-y-0  left-0 max-w-xs w-full bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out">
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-700">
-            <h2 className="text-lg font-semibold">Menú</h2>
+            <h2 className="text-l text-white font-semibold">Menú</h2>
             <button
               onClick={closeSidebar}
               className="p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700"
@@ -99,38 +104,38 @@ const Navbar = () => {
             </button>
           </div>
           
-          <div className="px-4 py-6 space-y-4">
+          <div className="px-4 py-6  space-y-4">
             <a
               href="/"
-              className="block hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              className="block hover:bg-gray-700  px-3 py-2 rounded-md text-white text-base font-medium transition duration-300"
               onClick={closeSidebar}
             >
               Inicio
             </a>
             <a
               href="/about"
-              className="block hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              className="block hover:bg-gray-700 px-3 py-2 rounded-md text-white text-base font-medium transition duration-300"
               onClick={closeSidebar}
             >
               Acerca de
             </a>
             <a
               href="/services"
-              className="block hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              className="block hover:bg-gray-700 px-3  text-white py-2 rounded-md text-base font-medium transition duration-300"
               onClick={closeSidebar}
             >
               Servicios
             </a>
             <a
               href="/contact"
-              className="block hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              className="block hover:bg-gray-700 px-3 py-2 rounded-md text-white text-base font-medium transition duration-300"
               onClick={closeSidebar}
             >
               Contacto
             </a>
             
             <div className="pt-4 border-t border-gray-700">
-              <button className="w-full bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md text-base font-medium transition duration-300">
+              <button className="w-full bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded-md text-base font-medium transition duration-300">
                 Login
               </button>
             </div>

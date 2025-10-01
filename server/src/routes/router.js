@@ -5,7 +5,7 @@ const router = Router();
 
 
 router.get("/", (req, res) => {
-  res.send("Hello from Router!");
+  res.json({ data: "Hello from Router!"});
 });
 
 router.post("/data", (req, res) => {
