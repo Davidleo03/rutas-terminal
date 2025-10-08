@@ -24,6 +24,7 @@ const Home = () => {
                     </div>
                 </div>
             </section>
+            <footer className="bg-gray-800 text-white py-6">
         </>
     )
 };
