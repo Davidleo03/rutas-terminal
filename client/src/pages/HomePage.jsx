@@ -3,8 +3,13 @@ import Navbar from "../components/Navbar";
 import fondo from "../assets/fondo.webp";
 import { HomeLinks } from "../utils/Links";
 import Footer from "../components/Footer";
+import useAuthStore from "../localStore/auth.js";
 
-const Home = () => {
+const HomePage = () => {
+
+    const { token, setToken } = useAuthStore();
+
+    console.log("Token in HomePage:", token);
 
     
     return (
@@ -51,10 +56,11 @@ const Home = () => {
 
                 </div>
             </section>
+            
             <Footer />
              
         </>
     )
 };
 
-export default Home;
+export default HomePage;
