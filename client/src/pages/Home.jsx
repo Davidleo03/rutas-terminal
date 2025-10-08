@@ -13,7 +13,7 @@ const Home = () => {
                 style={{ backgroundImage: `url(${fondo})` }}
             >
                 <div className="text-center bg-white bg-opacity-20 animate-slide-in-right size-full p-10 rounded-2xl shadow-2xl max-w-2xl mx-auto flex flex-col items-center animate-fade-in">
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-6 drop-shadow-lg">Rutas y Horarios Terminal San Juan de los Morros</h1>
+                    <h1 className="text-xl md:text-4xl font-extrabold text-blue-900 mb-6  drop-shadow-lg">Rutas y Horarios Terminal San Juan de los Morros</h1>
                     <p className="text-lg md:text-xl text-gray-800 mb-4 font-medium">
                         Encuentra información actualizada sobre horarios, paradas, recorridos y terminales para planificar tu viaje de manera rápida y segura.
                     </p>
