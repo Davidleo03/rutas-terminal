@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar";
+import fondo from "../assets/fondo.webp";
 
 
 const Home = () => {
@@ -9,7 +10,7 @@ const Home = () => {
             <Navbar />
             <section
                 className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center"
-                style={{ backgroundImage: "url('https://nomadasvenezuela.wordpress.com/wp-content/uploads/2016/12/morros.jpg?w=672&h=372&crop=1')" }}
+                style={{ backgroundImage: `url(${fondo})` }}
             >
                 <div className="text-center bg-white bg-opacity-20 animate-slide-in-right size-full p-10 rounded-2xl shadow-2xl max-w-2xl mx-auto flex flex-col items-center animate-fade-in">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-6 drop-shadow-lg">Rutas y Horarios Terminal San Juan de los Morros</h1>

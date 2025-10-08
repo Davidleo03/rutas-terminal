@@ -1,5 +1,6 @@
 // components/Navbar.jsx
 import React, { useState } from 'react';
+import logo from '../assets/logo.jpg'; 
 
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,7 +23,7 @@ const Navbar = () => {
             <div className="flex items-center">
                         <div className="flex-shrink-0 flex items-center gap-2">
                           <img
-                            src="https://img.freepik.com/vector-premium/estacion-autobuses-interurbanos-terminal-espera-transporte-pasajeros-ilustracion-vectorial_333239-550.jpg"
+                            src={logo}
                             alt="Logo"
                             className="w-10 h-10 rounded-full object-cover border-2 border-blue-600 shadow-md bg-white"
                           />
