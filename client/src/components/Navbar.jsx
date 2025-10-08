@@ -18,8 +18,8 @@ const Navbar = ({ links }) => {
 
   return (
     <>
-      {/* Navbar Principal */}
-      <nav className="bg-gray-800 text-white shadow-lg">
+  {/* Navbar Principal (fijo) */}
+  <nav className="bg-gray-800 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo y Brand */}
@@ -82,7 +82,10 @@ const Navbar = ({ links }) => {
             </div>
           </div>
         </div>
-      </nav>
+  </nav>
+
+  {/* Espaciador para compensar el navbar fijo (misma altura que el nav) */}
+  <div className="h-16" aria-hidden="true" />
 
       {/* Sidebar Mobile */}
       <div className={`fixed inset-0 z-50  md:hidden ${isSidebarOpen ? 'block' : 'hidden'}`}>
