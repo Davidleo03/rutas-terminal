@@ -1,9 +1,12 @@
 // components/Navbar.jsx
 import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import logo from '../assets/logo.jpg'; 
 
-const Navbar = () => {
+const Navbar = ({ links }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -33,18 +36,16 @@ const Navbar = () => {
               {/* Navigation Links - Desktop */}
               <div className="hidden md:block ml-10">
                 <div className="flex space-x-4">
-                  <a href="/" className="hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300">
-                    Inicio
-                  </a>
-                  <a href="/about" className="hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300">
-                    Acerca de
-                  </a>
-                  <a href="/services" className="hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300">
-                    Servicios
-                  </a>
-                  <a href="/contact" className="hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-300">
-                    Contacto
-                  </a>
+                  {links.map((link) => (
+                    <NavLink
+                      key={link.to}
+                      to={link.to}
+                      className={({isActive}) => `px-3 py-2 rounded-md text-sm font-medium transition duration-300 ${isActive ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                    >
+                      {link.label}
+                    </NavLink>
+                  ))}
+                  
                 </div>
               </div>
             </div>
@@ -106,34 +107,16 @@ const Navbar = () => {
           </div>
           
           <div className="px-4 py-6  space-y-4">
-            <a
-              href="/"
-              className="block hover:bg-gray-700  px-3 py-2 rounded-md text-white text-base font-medium transition duration-300"
-              onClick={closeSidebar}
-            >
-              Inicio
-            </a>
-            <a
-              href="/about"
-              className="block hover:bg-gray-700 px-3 py-2 rounded-md text-white text-base font-medium transition duration-300"
-              onClick={closeSidebar}
-            >
-              Acerca de
-            </a>
-            <a
-              href="/services"
-              className="block hover:bg-gray-700 px-3  text-white py-2 rounded-md text-base font-medium transition duration-300"
-              onClick={closeSidebar}
-            >
-              Servicios
-            </a>
-            <a
-              href="/contact"
-              className="block hover:bg-gray-700 px-3 py-2 rounded-md text-white text-base font-medium transition duration-300"
-              onClick={closeSidebar}
-            >
-              Contacto
-            </a>
+            {links.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                onClick={closeSidebar}
+                className={({isActive}) => `block px-3 py-2 rounded-md text-base font-medium transition duration-300 ${isActive ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+              >
+                {link.label}
+              </NavLink>
+            ))}
             
             <div className="pt-4 border-t border-gray-700">
               <button className="w-full bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded-md text-base font-medium transition duration-300">
