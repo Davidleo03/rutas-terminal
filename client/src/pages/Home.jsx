@@ -24,7 +24,34 @@ const Home = () => {
                     </div>
                 </div>
             </section>
+            <section>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-extrabold text-gray-900 mb-4">¿Por qué elegirnos?</h2>
+                        <p className="text-lg text-gray-600">Ofrecemos la información más precisa y actualizada para que tu viaje sea seguro y eficiente.</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="bg-white p-6 rounded-lg shadow-md transform hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition duration-300 ease-out">
+                            <h3 className="text-xl font-semibold text-blue-600 mb-4">Información Actualizada</h3>
+                            <p className="text-gray-600">Mantenemos nuestros datos al día para que siempre tengas la información correcta sobre rutas y horarios.</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-lg shadow-md transform hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition duration-300 ease-out">
+                            <h3 className="text-xl font-semibold text-blue-600 mb-4">Fácil de Usar</h3>
+                            <p className="text-gray-600">Nuestra plataforma es intuitiva y fácil de navegar, permitiéndote encontrar lo que necesitas rápidamente.</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-lg shadow-md transform hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition duration-300 ease-out">
+                            <h3 className="text-xl font-semibold text-blue-600 mb-4">Soporte al Cliente</h3>
+                            <p className="text-gray-600">Nuestro equipo de soporte está disponible para ayudarte con cualquier consulta o problema que puedas tener.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
             <footer className="bg-gray-800 text-white py-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <p className="text-sm">&copy; 2024 Rutas Terminal San Juan de los Morros. Todos los derechos reservados.</p>
+                </div>
+            </footer>   
         </>
     )
 };
