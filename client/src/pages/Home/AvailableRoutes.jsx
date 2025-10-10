@@ -5,7 +5,7 @@ const AvailableRoutes = () => {
     {
       id: 1,
       origen: 'Terminal Central',
-      destino: 'Ciudad B',
+      destino: 'San Sebastian',
       precio: 25000,
       duracion: '2h 30m',
       servicio: 'Directo',
@@ -21,7 +21,7 @@ const AvailableRoutes = () => {
     {
       id: 2,
       origen: 'Terminal Central',
-      destino: 'Ciudad C',
+      destino: 'San Felipe',
       precio: 35000,
       duracion: '3h 15m',
       servicio: 'Parada Corta',
