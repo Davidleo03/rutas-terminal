@@ -37,7 +37,7 @@ const AvailableRoutes = () => {
     {
       id: 3,
       origen: 'Terminal Central',
-      destino: 'Ciudad D',
+      destino: 'Cagua',
       precio: 42000,
       duracion: '4h 00m',
       servicio: 'Directo',
