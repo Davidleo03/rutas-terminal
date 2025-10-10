@@ -1,15 +1,12 @@
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import fondo from "../assets/fondo.webp";
-import { HomeLinks } from "../utils/Links";
-import Footer from "../components/Footer";
-import useAuthStore from "../localStore/auth.js";
+import Navbar from "./components/Navbar.jsx";
+import fondo from "../../assets/fondo.webp";
+import { HomeLinks } from "../../utils/Links.js";
+import Footer from "./components/Footer.jsx";
 
 const HomePage = () => {
 
-    const { token, setToken } = useAuthStore();
-
-    console.log("Token in HomePage:", token);
+    
 
     
     return (

@@ -1,7 +1,7 @@
 // components/Navbar.jsx
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import logo from '../assets/logo.jpg'; 
+import logo from '../../../assets/logo.jpg'; 
 
 const Navbar = ({ links }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
