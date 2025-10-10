@@ -25,7 +25,7 @@ const HomePage = () => {
                     
                     <div className="flex flex-col md:flex-row gap-4 w-full justify-center">
                         <Link to={'/rutas'} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition duration-300">Ver rutas</Link>
-                        <button className="bg-white hover:bg-gray-100 text-blue-700 border border-blue-600 px-6 py-3 rounded-lg font-semibold shadow-md transition duration-300">Contactar soporte</button>
+                        <Link to={'/rutas/disponibles'} className="bg-white hover:bg-gray-100 text-blue-700 border border-blue-600 px-6 py-3 rounded-lg font-semibold shadow-md transition duration-300">Rutas Cargando</Link>
                     </div>
                 </div>
             </section>
