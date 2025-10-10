@@ -1,10 +1,13 @@
 // components/Navbar.jsx
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import logo from '../../../assets/logo.jpg'; 
+import logo from '../../../assets/logo.jpg';
+import { useNavigate } from 'react-router-dom'; 
 
 const Navbar = ({ links }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const navigate = useNavigate();
 
 
 
@@ -53,7 +56,7 @@ const Navbar = ({ links }) => {
             {/* Desktop Menu Right */}
             <div className="hidden md:block">
               <div className="flex items-center space-x-4">
-                <button className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md text-sm font-medium transition duration-300">
+                <button onClick={() => navigate('/login')} className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md text-sm font-medium transition duration-300">
                   Login
                 </button>
               </div>
@@ -122,7 +125,7 @@ const Navbar = ({ links }) => {
             ))}
             
             <div className="pt-4 border-t border-gray-700">
-              <button className="w-full bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded-md text-base font-medium transition duration-300">
+              <button onClick={() => navigate('/login')} className="w-full bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded-md text-base font-medium transition duration-300">
                 Login
               </button>
             </div>

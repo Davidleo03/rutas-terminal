@@ -1,6 +1,8 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import usersRoutes from './users'
 import homeRoutes from './home'
+import NotFound from '../pages/NotFoud'
+import Login from '../pages/Login'
 
 const router = createBrowserRouter([
   ...homeRoutes,
@@ -13,8 +15,12 @@ const router = createBrowserRouter([
     children: usersRoutes
   },
   {
-    path: "/home",
-    element: <h2>Home</h2>
+    path: "/login",
+    element: <Login />
+  },
+  {
+    path: "*",
+    element: <NotFound />
   }
 ])
 
