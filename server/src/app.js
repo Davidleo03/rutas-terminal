@@ -3,6 +3,8 @@ import cors from 'cors';
 
 import configuraction from './config/env.config.js';
 import router from './routes/router.js';
+import errorHandler from './middleware/errorHandler.js';
+
 
 
 const app = express();
@@ -14,7 +16,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(router)
 
-
+// Registrar middleware de manejo de errores (después de las rutas)
+app.use(errorHandler);
 
 const PORT = configuraction.port;
 

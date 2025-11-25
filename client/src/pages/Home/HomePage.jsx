@@ -1,10 +1,15 @@
 import { Link } from "react-router-dom";
+
 import Navbar from "./components/Navbar.jsx";
 import fondo from "../../assets/fondo.webp";
 import { HomeLinks } from "../../utils/Links.js";
 import Footer from "./components/Footer.jsx";
 
+
 const HomePage = () => {
+
+    
+    
 
     
 
