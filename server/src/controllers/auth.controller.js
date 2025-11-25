@@ -14,7 +14,12 @@ class AuthController {
             });
         } catch (error) {
             console.error('Error en el servidor:', error.message);
-            
+            // Si el error parece de autenticación, devolver 401
+            const msg = String(error.message || '').toLowerCase();
+            if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('email') || msg.includes('password')) {
+                return res.status(401).json({ error: 'Credenciales inválidas' });
+            }
+
             res.status(500).json({ error: 'Error interno del servidor' });
         }
     }

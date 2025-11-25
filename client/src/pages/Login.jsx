@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useLogin from '../hooks/useLogin';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [ isLoading, setIsLoading ] = useState(false);
   const navigate = useNavigate();
 
+  const { mutate: loginMutate, error, clearError } = useLogin();
+
   const handleSubmit = (e) => {
+    setIsLoading(true);
+    
     e.preventDefault();
-    setLoading(true);
-    // Aquí iría la lógica real de login (API call). Por ahora simulamos y redirigimos.
-    setTimeout(() => {
-      setLoading(false);
-      navigate('/');
-    }, 700);
+    clearError();
+    loginMutate({ email, password });
+    setIsLoading(false);
+    
   };
 
   return (
@@ -53,15 +56,17 @@ const Login = () => {
           <button
             type="submit"
             className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-60"
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading ? 'Cargando...' : 'Iniciar sesión'}
+            {isLoading ? 'Cargando...' : 'Iniciar sesión'}
           </button>
         </form>
 
-        <div className="text-center mt-4 text-sm text-gray-500">
-          ¿No tienes cuenta? <button type="button" className="text-indigo-600 hover:underline">Regístrate</button>
-        </div>
+        {error && (
+          <div className="text-center mt-4 text-sm text-red-600">{error}</div>
+        )}
+
+        
       </div>
     </div>
   );

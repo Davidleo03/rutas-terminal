@@ -18,11 +18,4 @@ app.use(router)
 
 // Registrar middleware de manejo de errores (después de las rutas)
 app.use(errorHandler);
-
-const PORT = configuraction.port;
-
-
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+export default app;
