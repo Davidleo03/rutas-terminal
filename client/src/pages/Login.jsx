@@ -5,19 +5,20 @@ import useLogin from '../hooks/useLogin';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [ isLoading, setIsLoading ] = useState(false);
   const navigate = useNavigate();
 
-  const { mutate: loginMutate, error, clearError } = useLogin();
+  const { mutate: loginMutate, error, clearError, isLoading, setIsLoading } = useLogin();
 
   const handleSubmit = (e) => {
     setIsLoading(true);
     
     e.preventDefault();
-    clearError();
-    loginMutate({ email, password });
-    setIsLoading(false);
+    if (error) {
+      clearError();
+    }
+    loginMutate({ email, password });  
     
+
   };
 
   return (
