@@ -35,6 +35,19 @@ class UserModel {
     }
     return data;
   }
+
+  static async getUserByEmail(email) {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  }
 }
 
 export default UserModel;

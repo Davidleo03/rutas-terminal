@@ -1,41 +1,36 @@
-import supabase from "../libs/supabase";
+/* Simple API helpers for the client app. */
 
-const url = import.meta.env.VITE_URL_SEVICE_API;
+const API_BASE = import.meta.env.VITE_URL_SEVICE_API || '';
 
-export const getUsers = async () => {
+export async function loginUser({ email, password } = {}) {
+  if (!email || !password) throw new Error('Email y contraseña son requeridos');
+
+  const url = `${API_BASE.replace(/\/$/, '')}/auth/login`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  let payload;
   try {
-    let { data: users, error } = await supabase.from('usuarios').select('*');
-
-    if (error) {
-      throw error;
-    }
-
-    return users;   
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
+    payload = await res.json();
+  } catch (e) {
+    throw new Error('Respuesta inválida del servidor');
   }
+
+  if (!res.ok) {
+    // try to surface a useful message from the response body
+    const message = payload?.error || payload?.message || 'Error al iniciar sesión';
+    throw new Error(message);
+  }
+
+  return payload;
 }
 
-export const loginUser = async (credentials) => {
-  try {
-    // Normalizar URL para evitar doble slash
-    const base = String(url || '').replace(/\/+$/, '');
-    const res = await fetch(`${base}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || data.message || 'Error en login');
-    }
-
-    return data;
-  } catch (error) {
-    console.error('loginUser error:', error);
-    throw error;
-  }
+export default {
+  loginUser,
 };

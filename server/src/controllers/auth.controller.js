@@ -1,16 +1,30 @@
 import AuthModel from "../models/auth.model.js";
+import UserModel from "../models/user.model.js";
 
 class AuthController {
     static async loginUser(req, res) {
         const userData = req.body;
         
         try {
-            const response = await AuthModel.LoginUser(userData);
+            const auth = await AuthModel.LoginUser(userData);
+
+            const { email } = auth.user;
+
+            const user = await UserModel.getUserByEmail(email);
+
+            
+
+            if (!user) {
+                return res.status(404).json({ error: 'Usuario no encontrado' });
+            }
+            
+             
+
             
             res.status(200).json({
                 message: 'Login exitoso',
-                user: response.user,
-                session: response.session
+                session: auth.session,
+                user : user
             });
         } catch (error) {
             console.error('Error en el servidor:', error.message);

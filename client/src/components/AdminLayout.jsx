@@ -5,6 +5,7 @@ import useAuthStore from '../localStore/auth';
 export default function AdminLayout({ children }) {
   const clearToken = useAuthStore((s) => s.clearToken);
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
 
   const handleLogout = () => {
     clearToken();
@@ -22,13 +23,17 @@ export default function AdminLayout({ children }) {
       <nav className="flex flex-row md:flex-col items-center md:items-stretch gap-2 md:gap-3 p-3 md:p-6 bg-white shadow-md md:shadow-none md:min-h-screen md:w-64">
         <div className="flex-shrink-0 px-2 py-1 font-bold text-lg text-indigo-600">Admin</div>
 
-        <NavLink to="/admin" className={linkClass} end>
-          <span>Dashboard</span>
-        </NavLink>
+        {user?.role === 'admin' && (
+          <NavLink to="/admin" className={linkClass} end>
+            <span>Dashboard</span>
+          </NavLink>
+        )}
 
-        <NavLink to="/admin-empresa" className={linkClass}>
-          <span>Admin Empresa</span>
-        </NavLink>
+        {user?.role === 'admi-linea' && (
+          <NavLink to="/admin-empresa" className={linkClass}>
+            <span>Admin Empresa</span>
+          </NavLink>
+        )}
 
         <button onClick={handleLogout} className="mt-2 md:mt-auto px-4 py-2 rounded-md text-sm text-red-600 hover:bg-red-50">
           Cerrar sesión
