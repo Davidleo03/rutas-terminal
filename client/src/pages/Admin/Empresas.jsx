@@ -34,20 +34,21 @@ const Empresas = () => {
   };
 
   const handleRegistrar = () => {
-    console.log('Registrar nueva empresa');
+    
     setEditing(null);
     setIsModalOpen(true);
   };
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat rounded-lg"
-      style={{ backgroundImage: "url('/images/admin.jpg')" }}
-    >
-      <div className="min-h-screen bg-black/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto p-4 sm:p-6">
-          <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg">
-            <div className="p-6">
+    <>
+      <div
+        className="min-h-screen bg-cover bg-center bg-no-repeat rounded-lg"
+        style={{ backgroundImage: "url('/images/admin.jpg')" }}
+      >
+        <div className="min-h-screen bg-black/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto p-4 sm:p-6">
+            <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg">
+              <div className="p-6">
       {/* Estado de carga */}
       {isLoading && (
         <div className="text-center py-6">
@@ -78,7 +79,7 @@ const Empresas = () => {
       )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Empresas</h1>
-        <p className="mt-2 text-gray-600">Área privada —</p>
+        <p className="mt-2 text-gray-600">Área privada</p>
         {actionAlert && (
           <div className={`mt-3 p-3 rounded ${actionAlert.type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'}`}>
             {actionAlert.message}
@@ -185,7 +186,8 @@ const Empresas = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

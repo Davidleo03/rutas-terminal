@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCreateEmpresa, useUpdateEmpresa } from '../services/Empresas/hooks';
 
 export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSuccess }) {
@@ -25,10 +25,28 @@ export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSu
     setForm((s) => ({ ...s, [name]: value }));
   };
 
+  // Initialize or clear form when modal opens/closes or when editing data changes
+  useEffect(() => {
+    if (isOpen) {
+      setForm({
+        nombre_empresa: initialData?.nombre_empresa || '',
+        rif: initialData?.rif || '',
+        tipo_ruta: initialData?.tipo_ruta || initialData?.tipo_empresa || 'urbana',
+      });
+      setLocalError(null);
+      setAlert(null);
+    } else {
+      // clear when modal closes
+      setForm({ nombre_empresa: '', rif: '', tipo_ruta: 'urbana' });
+      setLocalError(null);
+      setAlert(null);
+    }
+  }, [isOpen, initialData]);
+
   const validate = () => {
     if (!form.nombre_empresa.trim()) return 'El nombre de la empresa es requerido.';
     if (!form.rif.trim()) return 'El RIF es requerido.';
-    if (!['urbana', 'extra_urbana'].includes(form.tipo_ruta)) return 'Tipo de ruta inválido.';
+    if (!['urbana', 'extra-urbana'].includes(form.tipo_ruta)) return 'Tipo de ruta inválido.';
     return null;
   };
 
@@ -37,6 +55,7 @@ export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSu
     setLocalError(null);
     const v = validate();
     if (v) return setLocalError(v);
+    
 
     // Prepare callbacks for both create and update to show alerts and close modal
     const commonCallbacks = {
@@ -47,6 +66,11 @@ export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSu
         setTimeout(() => {
           setAlert(null);
           onClose();
+          setForm({
+            nombre_empresa: '',
+            rif: '',
+            tipo_ruta: 'urbana',
+          });
         }, 1400);
       },
       onError: (err) => {
@@ -65,7 +89,7 @@ export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSu
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 lg:mt-40 md:mt-50 sm:mt-60 z-50 flex items-end sm:items-center  justify-center animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex mt-50 items-center justify-center animate-in fade-in duration-300">
       <div
         className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60 backdrop-blur-sm"
         onClick={() => {
@@ -158,7 +182,7 @@ export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSu
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-0 focus:border-transparent shadow-sm hover:border-gray-400 bg-white cursor-pointer"
               >
                 <option value="urbana">Urbana</option>
-                <option value="extra_urbana">Extra urbana</option>
+                <option value="extra-urbana">Extra urbana</option>
               </select>
             </div>
           </div>
