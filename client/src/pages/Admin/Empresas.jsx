@@ -1,23 +1,42 @@
-import { useEmpresas } from "../../services/Empresas/hooks";
+import { useEmpresas, useDeleteEmpresa } from "../../services/Empresas/hooks";
+import { useState } from 'react';
+import ModalEmpresa from '../../components/ModalEmpresa';
 
 const Empresas = () => {
   const { data: rutas = [], isLoading, isError, error, refetch } = useEmpresas();
 
   
 
-  const handleEditar = (id) => {
-    console.log('Editar ruta:', id);
-    // Lógica para editar
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [actionAlert, setActionAlert] = useState(null);
+
+  const deleteMutation = useDeleteEmpresa();
+
+  const handleEditar = (ruta) => {
+    setEditing(ruta);
+    setIsModalOpen(true);
   };
 
   const handleEliminar = (id) => {
-    console.log('Eliminar ruta:', id);
-    // Lógica para eliminar
+    const ok = window.confirm('¿Eliminar esta empresa? Esta acción no se puede deshacer.');
+    if (!ok) return;
+    deleteMutation.mutate({ id }, {
+      onSuccess: () => {
+        setActionAlert({ type: 'success', message: 'Empresa eliminada correctamente.' });
+        refetch();
+        setTimeout(() => setActionAlert(null), 2000);
+      },
+      onError: (err) => {
+        setActionAlert({ type: 'error', message: String(err?.message || err) });
+      },
+    });
   };
 
   const handleRegistrar = () => {
-    console.log('Registrar nueva ruta');
-    // Lógica para registrar nueva ruta
+    console.log('Registrar nueva empresa');
+    setEditing(null);
+    setIsModalOpen(true);
   };
 
   return (
@@ -60,6 +79,11 @@ const Empresas = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Empresas</h1>
         <p className="mt-2 text-gray-600">Área privada —</p>
+        {actionAlert && (
+          <div className={`mt-3 p-3 rounded ${actionAlert.type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'}`}>
+            {actionAlert.message}
+          </div>
+        )}
       </div>
 
       {/* Botón Registrar Ruta */}
@@ -76,7 +100,7 @@ const Empresas = () => {
       </div>
 
       {/* Tabla Responsiva */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -117,7 +141,7 @@ const Empresas = () => {
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => handleEditar(ruta.id_empresa)}
+                        onClick={() => handleEditar(ruta)}
                         className="text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
                         title="Editar"
                       >
@@ -149,6 +173,14 @@ const Empresas = () => {
           No hay rutas registradas. Haz clic en "Registrar Ruta" para agregar la primera.
         </div>
       )}
+
+      {/* Modal para crear/editar empresas */}
+      <ModalEmpresa
+        isOpen={isModalOpen}
+        onClose={() => { setIsModalOpen(false); setEditing(null); }}
+        initialData={editing}
+        onSuccess={() => { refetch(); setEditing(null); }}
+      />
             </div>
           </div>
         </div>

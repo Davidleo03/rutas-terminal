@@ -15,8 +15,7 @@ export default function AdminLayout({ children }) {
   };
 
   const linkClass = ({ isActive }) =>
-    `px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium ${
-      isActive ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'
+    `px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium ${isActive ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'
     }`;
 
   return (
@@ -41,13 +40,15 @@ export default function AdminLayout({ children }) {
               <span>Dashboard</span>
             </NavLink>
 
+            <NavLink to="/admin/empresas" className={linkClass}>
+              <span>Empresas</span>
+            </NavLink>
+
             <NavLink to="/admin/rutas" className={linkClass}>
               <span>Rutas</span>
             </NavLink>
 
-            <NavLink to="/admin/empresas" className={linkClass}>
-              <span>Empresas</span>
-            </NavLink>
+
 
             <NavLink to="/admin/usuarios" className={linkClass}>
               <span>Usuarios</span>
@@ -95,13 +96,15 @@ export default function AdminLayout({ children }) {
                 <span>Dashboard</span>
               </NavLink>
 
+              <NavLink to="/admin/empresas" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Empresas</span>
+              </NavLink>
+
               <NavLink to="/admin/rutas" className={linkClass} onClick={() => setOpen(false)}>
                 <span>Rutas</span>
               </NavLink>
 
-              <NavLink to="/admin/empresas" className={linkClass} onClick={() => setOpen(false)}>
-                <span>Empresas</span>
-              </NavLink>
+
 
               <NavLink to="/admin/usuarios" className={linkClass} onClick={() => setOpen(false)}>
                 <span>Usuarios</span>
