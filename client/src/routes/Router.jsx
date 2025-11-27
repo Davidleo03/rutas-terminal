@@ -1,12 +1,10 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import usersRoutes from './users'
 import homeRoutes from './home'
+import adminRoutes from './admin'
+import adminEmpresaRoutes from './adminEmpresa'
 import NotFound from '../pages/NotFoud'
 import Login from '../pages/Auth/Login'
-import RequireAuth from '../components/RequireAuth'
-import Admin from '../pages/Admin/Admin'
-import AdminEmpresa from '../pages/Admin/AdminEmpresa'
-import AdminLayout from '../components/AdminLayout'
 
 const router = createBrowserRouter([
   ...homeRoutes,
@@ -22,26 +20,8 @@ const router = createBrowserRouter([
     path: "/login",
     element: <Login />
   },
-  {
-    path: "/admin",
-    element: (
-      <RequireAuth allowedRoles={[ 'admin' ]}>
-        <AdminLayout>
-          <Admin />
-        </AdminLayout>
-      </RequireAuth>
-    ),
-  },
-  {
-    path: "/admin-empresa",
-    element: (
-      <RequireAuth allowedRoles={[ 'admin-linea' ]}>
-        <AdminLayout>
-          <AdminEmpresa />
-        </AdminLayout>
-      </RequireAuth>
-    ),
-  },
+  ...adminRoutes,
+  ...adminEmpresaRoutes,
   {
     path: "*",
     element: <NotFound />

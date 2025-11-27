@@ -1,14 +1,16 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, useNavigate, Outlet } from 'react-router-dom';
 import useAuthStore from '../localStore/auth';
 
 export default function AdminLayout({ children }) {
+  const [open, setOpen] = useState(false);
   const clearToken = useAuthStore((s) => s.clearToken);
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
 
   const handleLogout = () => {
     clearToken();
+    setOpen(false);
     navigate('/login');
   };
 
@@ -19,14 +21,58 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
-      {/* Menu: horizontal on mobile, vertical on md+ */}
-      <nav className="flex flex-row md:flex-col items-center md:items-stretch gap-2 md:gap-3 p-3 md:p-6 bg-white shadow-md md:shadow-none md:min-h-screen md:w-64">
+      {/* Mobile header with hamburger */}
+      <div className="md:hidden w-full flex items-center justify-between p-3 bg-white shadow">
+        <div className="font-bold text-lg text-indigo-600">Admin</div>
+        <button
+          aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+          onClick={() => setOpen((v) => !v)}
+          className="p-2 rounded-md focus:outline-none"
+        >
+          {open ? '✕' : '☰'}
+        </button>
+      </div>
+      {/* Desktop sidebar */}
+      <nav className="hidden md:flex flex-col items-stretch gap-3 p-6 bg-white md:min-h-screen md:w-64">
         <div className="flex-shrink-0 px-2 py-1 font-bold text-lg text-indigo-600">Admin</div>
-
         {user?.role === 'admin' && (
-          <NavLink to="/admin" className={linkClass} end>
-            <span>Dashboard</span>
-          </NavLink>
+          <>
+            <NavLink to="/admin" className={linkClass} end>
+              <span>Dashboard</span>
+            </NavLink>
+
+            <NavLink to="/admin/rutas" className={linkClass}>
+              <span>Rutas</span>
+            </NavLink>
+
+            <NavLink to="/admin/empresas" className={linkClass}>
+              <span>Empresas</span>
+            </NavLink>
+
+            <NavLink to="/admin/usuarios" className={linkClass}>
+              <span>Usuarios</span>
+            </NavLink>
+
+            <NavLink to="/admin/buses" className={linkClass}>
+              <span>Buses</span>
+            </NavLink>
+
+            <NavLink to="/admin/choferes" className={linkClass}>
+              <span>Choferes</span>
+            </NavLink>
+
+            <NavLink to="/admin/rutas-tiempo-real" className={linkClass}>
+              <span>Rutas Tiempo Real</span>
+            </NavLink>
+
+            <NavLink to="/admin/asignacion-choferes" className={linkClass}>
+              <span>Asignación Choferes</span>
+            </NavLink>
+
+            <NavLink to="/admin/reportes-viajes" className={linkClass}>
+              <span>Reportes</span>
+            </NavLink>
+          </>
         )}
 
         {user?.role === 'admi-linea' && (
@@ -40,8 +86,63 @@ export default function AdminLayout({ children }) {
         </button>
       </nav>
 
+      {/* Mobile menu (dropdown) */}
+      {open && (
+        <nav className="md:hidden flex flex-col items-stretch gap-2 p-3 bg-white shadow">
+          {user?.role === 'admin' && (
+            <>
+              <NavLink to="/admin" className={linkClass} end onClick={() => setOpen(false)}>
+                <span>Dashboard</span>
+              </NavLink>
+
+              <NavLink to="/admin/rutas" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Rutas</span>
+              </NavLink>
+
+              <NavLink to="/admin/empresas" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Empresas</span>
+              </NavLink>
+
+              <NavLink to="/admin/usuarios" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Usuarios</span>
+              </NavLink>
+
+              <NavLink to="/admin/buses" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Buses</span>
+              </NavLink>
+
+              <NavLink to="/admin/choferes" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Choferes</span>
+              </NavLink>
+
+              <NavLink to="/admin/rutas-tiempo-real" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Rutas Tiempo Real</span>
+              </NavLink>
+
+              <NavLink to="/admin/asignacion-choferes" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Asignación Choferes</span>
+              </NavLink>
+
+              <NavLink to="/admin/reportes-viajes" className={linkClass} onClick={() => setOpen(false)}>
+                <span>Reportes</span>
+              </NavLink>
+            </>
+          )}
+
+          {user?.role === 'admi-linea' && (
+            <NavLink to="/admin-empresa" className={linkClass} onClick={() => setOpen(false)}>
+              <span>Admin Empresa</span>
+            </NavLink>
+          )}
+
+          <button onClick={() => { setOpen(false); handleLogout(); }} className="mt-2 px-4 py-2 rounded-md text-sm text-red-600 hover:bg-red-50">
+            Cerrar sesión
+          </button>
+        </nav>
+      )}
+
       <main className="flex-1 p-4 md:p-8">
-        {children}
+        {children ?? <Outlet />}
       </main>
     </div>
   );

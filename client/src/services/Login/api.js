@@ -1,6 +1,6 @@
 /* Simple API helpers for the client app. */
 
-const API_BASE = import.meta.env.VITE_URL_SEVICE_API || '';
+import { API_BASE } from '../config.js';
 
 export async function loginUser({ email, password } = {}) {
   if (!email || !password) throw new Error('Email y contraseña son requeridos');

@@ -1,6 +1,7 @@
 import React from 'react';
 
 const Admin = () => {
+  console.log('Admin page rendered');
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold">Panel Admin</h1>
