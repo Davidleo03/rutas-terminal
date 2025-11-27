@@ -4,7 +4,7 @@ class BusesModel {
     static async getBuses() {
         const { data, error } = await supabase
             .from('buses')
-            .select('*');
+            .select('*, empresa:empresa_id(*)');
 
         if (error) {
             throw new Error('Error al obtener los buses: ' + error.message);

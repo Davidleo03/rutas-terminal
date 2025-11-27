@@ -13,6 +13,7 @@ class UserModel {
   }
 
   static async createUser(userData) {
+    
 
     const { data: user } = await supabase
       .from('usuarios')

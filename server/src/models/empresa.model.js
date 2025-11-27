@@ -5,7 +5,8 @@ class EmpresaModel {
         const { data, error } = await supabase
             .from('empresas')
             .select('*')
-            .order('id_empresa', { ascending: true });
+            .order('id_empresa', { ascending: true })
+            
 
         if (error) {
             throw new Error('Error al obtener las empresas: ' + error.message);

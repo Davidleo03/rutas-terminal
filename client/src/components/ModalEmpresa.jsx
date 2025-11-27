@@ -1,89 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useCreateEmpresa, useUpdateEmpresa } from '../services/Empresas/hooks';
+import { useModalEmpresaForm } from '../hooks/empresa/modal/useForm';
+import { useModalEmpresaAlert } from '../hooks/empresa/modal/useAlert';
+import { useModalEmpresaMutations } from '../hooks/empresa/modal/useMutations.js';
 
 export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSuccess }) {
-  // Component unmounts when closed (see parent), so initializing state from props is safe here
-  const [form, setForm] = useState(() => ({
-    nombre_empresa: initialData?.nombre_empresa || '',
-    rif: initialData?.rif || '',
-    tipo_ruta: initialData?.tipo_ruta || initialData?.tipo_empresa || 'urbana',
-  }));
-  const [localError, setLocalError] = useState(null);
-  const [alert, setAlert] = useState(null); // {type: 'success'|'error', message: ''}
+  const { form, handleChange, validate, resetForm } = useModalEmpresaForm(initialData, isOpen);
+  const { localError, alert, clearErrors, setErrorAlert, setSuccessAlert, setValidationError } = useModalEmpresaAlert(isOpen);
+  const { isLoading, handleSubmit } = useModalEmpresaMutations(
+    initialData,
+    onSuccess,
+    onClose,
+    resetForm
+  );
 
-  const createMutation = useCreateEmpresa();
-  const updateMutation = useUpdateEmpresa();
+  // Clear errors and alerts when modal opens/closes
+  if (isOpen && !alert && !localError) {
+    // Errors will be cleared by useModalEmpresaAlert on initial render
+  }
 
-  // When component mounts with different initialData (modal opened), ensure form reflects it
-  // Parent unmounts modal when closed, so we only need to reset when initialData changes while open
-  // We'll watch initialData via a simple effectless pattern: when `isOpen` is true and initialData differs,
-  // reset form (safe because component remounts on open in parent). To keep logic simple (no useEffect),
-  // we reset form when user opens modal by relying on parent to unmount/mount.
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((s) => ({ ...s, [name]: value }));
-  };
-
-  // Initialize or clear form when modal opens/closes or when editing data changes
-  useEffect(() => {
-    if (isOpen) {
-      setForm({
-        nombre_empresa: initialData?.nombre_empresa || '',
-        rif: initialData?.rif || '',
-        tipo_ruta: initialData?.tipo_ruta || initialData?.tipo_empresa || 'urbana',
-      });
-      setLocalError(null);
-      setAlert(null);
-    } else {
-      // clear when modal closes
-      setForm({ nombre_empresa: '', rif: '', tipo_ruta: 'urbana' });
-      setLocalError(null);
-      setAlert(null);
-    }
-  }, [isOpen, initialData]);
-
-  const validate = () => {
-    if (!form.nombre_empresa.trim()) return 'El nombre de la empresa es requerido.';
-    if (!form.rif.trim()) return 'El RIF es requerido.';
-    if (!['urbana', 'extra-urbana'].includes(form.tipo_ruta)) return 'Tipo de ruta inválido.';
-    return null;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLocalError(null);
-    const v = validate();
-    if (v) return setLocalError(v);
-    
-
-    // Prepare callbacks for both create and update to show alerts and close modal
-    const commonCallbacks = {
-      onSuccess: () => {
-        const successMessage = initialData?.id_empresa ? 'Empresa actualizada correctamente.' : 'Empresa creada correctamente.';
-        setAlert({ type: 'success', message: successMessage });
-        onSuccess && onSuccess();
-        setTimeout(() => {
-          setAlert(null);
-          onClose();
-          setForm({
-            nombre_empresa: '',
-            rif: '',
-            tipo_ruta: 'urbana',
-          });
-        }, 1400);
-      },
-      onError: (err) => {
-        setAlert({ type: 'error', message: String(err?.message || err) });
-      },
-    };
-
-    if (initialData && initialData.id_empresa) {
-      updateMutation.mutate({ id: initialData.id_empresa, empresa: form }, commonCallbacks);
-    } else {
-      createMutation.mutate({ empresa: form }, commonCallbacks);
-    }
-  };
+  const onSubmit = handleSubmit(form, setSuccessAlert, setErrorAlert, setValidationError, validate);
 
   // If modal is closed, don't render
   if (!isOpen) return null;
@@ -93,13 +27,13 @@ export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSu
       <div
         className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60 backdrop-blur-sm"
         onClick={() => {
-          if (!createMutation.isLoading && !updateMutation.isLoading) onClose();
+          if (!isLoading) onClose();
         }}
       />
 
       <div className="relative w-full sm:w-full md:w-3/5 lg:w-2/5">
         <form
-          onSubmit={handleSubmit}
+          onSubmit={onSubmit}
           className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-auto animate-in slide-in-from-bottom-10 duration-300 sm:scale-in-95"
         >
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
@@ -113,7 +47,7 @@ export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSu
             </div>
             <button
               type="button"
-              onClick={() => { if (!createMutation.isLoading && !updateMutation.isLoading) onClose(); }}
+              onClick={() => { if (!isLoading) onClose(); }}
               className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-lg"
               aria-label="Cerrar"
             >
@@ -197,16 +131,16 @@ export default function ModalEmpresa({ isOpen, onClose, initialData = null, onSu
             </button>
             <button
               type="submit"
-              disabled={createMutation.isLoading || updateMutation.isLoading}
+              disabled={isLoading}
               className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-slate-700 to-slate-800 text-white font-medium hover:from-slate-800 hover:to-slate-900 transition-all duration-200 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {(createMutation.isLoading || updateMutation.isLoading) && (
+              {isLoading && (
                 <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                 </svg>
               )}
-              {createMutation.isLoading || updateMutation.isLoading ? 'Guardando...' : initialData ? 'Guardar cambios' : 'Crear Empresa'}
+              {isLoading  ? 'Guardando...' : initialData ? 'Guardar cambios' : 'Crear Empresa'}
             </button>
           </div>
         </form>
