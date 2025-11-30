@@ -1,3 +1,4 @@
+
 import BusesModel from "../models/buses.model.js";
 
 
@@ -15,6 +16,7 @@ class BusesController {
                 color: bus.color,
                 numero: bus.numero,
                 aire_acondicionado: bus.aire_acondicionado,
+                activo: bus.activo,
             }));
 
             res.status(200).json(buses);

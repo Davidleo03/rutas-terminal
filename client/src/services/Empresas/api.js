@@ -5,7 +5,12 @@ export async function getEmpresas() {
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error('Error al obtener las empresas');
+            let msg = 'Error al obtener las empresas';
+            try {
+                const err = await response.json();
+                if (err && err.message) msg = String(err.message);
+            } catch (e) {}
+            throw new Error(msg);
         }
         const data = await response.json();
         return data;
@@ -26,7 +31,12 @@ export async function createEmpresa(empresa) {
             body: JSON.stringify(empresa),
         });
         if (!response.ok) {
-            throw new Error('Error al crear la empresa');
+            let msg = 'Error al crear la empresa';
+            try {
+                const err = await response.json();
+                if (err && err.message) msg = String(err.message);
+            } catch (e) {}
+            throw new Error(msg);
         }
         const data = await response.json();
         return data;
@@ -47,7 +57,12 @@ export async function updateEmpresa(id, empresa) {
             body: JSON.stringify(empresa),
         });
         if (!response.ok) {
-            throw new Error('Error al actualizar la empresa');
+            let msg = 'Error al actualizar la empresa';
+            try {
+                const err = await response.json();
+                if (err && err.message) msg = String(err.message);
+            } catch (e) {}
+            throw new Error(msg);
         }
         const data = await response.json();
         return data;
@@ -64,7 +79,12 @@ export async function deleteEmpresa(id) {
             method: 'DELETE',
         });
         if (!response.ok) {
-            throw new Error('Error al eliminar la empresa');
+            let msg = 'Error al eliminar la empresa';
+            try {
+                const err = await response.json();
+                if (err && err.message) msg = String(err.message);
+            } catch (e) {}
+            throw new Error(msg);
         }
         return true;
     } catch (error) {

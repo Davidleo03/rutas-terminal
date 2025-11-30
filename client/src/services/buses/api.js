@@ -5,8 +5,15 @@ const base = API_BASE || '';
 export const fetchBuses = async () => {
   const res = await fetch(`${base}/buses`);
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Error fetching buses');
+    try {
+      const err = await res.json();
+      const error = new Error(err?.message || JSON.stringify(err) || 'Error fetching buses');
+      if (err && err.errors) error.errors = err.errors;
+      throw error;
+    } catch (e) {
+      const text = await res.text();
+      throw new Error(text || 'Error fetching buses');
+    }
   }
   return res.json();
 };
@@ -18,8 +25,15 @@ export const createBus = async (busData) => {
     body: JSON.stringify(busData),
   });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Error creating bus');
+    try {
+      const err = await res.json();
+      const error = new Error(err?.message || JSON.stringify(err) || 'Error creating bus');
+      if (err && err.errors) error.errors = err.errors;
+      throw error;
+    } catch (e) {
+      const text = await res.text();
+      throw new Error(text || 'Error creating bus');
+    }
   }
   return res.json();
 };
@@ -31,8 +45,15 @@ export const updateBus = async (busId, busData) => {
     body: JSON.stringify(busData),
   });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Error updating bus');
+    try {
+      const err = await res.json();
+      const error = new Error(err?.message || JSON.stringify(err) || 'Error updating bus');
+      if (err && err.errors) error.errors = err.errors;
+      throw error;
+    } catch (e) {
+      const text = await res.text();
+      throw new Error(text || 'Error updating bus');
+    }
   }
   return res.json();
 };
@@ -40,8 +61,15 @@ export const updateBus = async (busId, busData) => {
 export const deleteBus = async (busId) => {
   const res = await fetch(`${base}/buses/${busId}`, { method: 'DELETE' });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Error deleting bus');
+    try {
+      const err = await res.json();
+      const error = new Error(err?.message || JSON.stringify(err) || 'Error deleting bus');
+      if (err && err.errors) error.errors = err.errors;
+      throw error;
+    } catch (e) {
+      const text = await res.text();
+      throw new Error(text || 'Error deleting bus');
+    }
   }
   return res.json();
 };

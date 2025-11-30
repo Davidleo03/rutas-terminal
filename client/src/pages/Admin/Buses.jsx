@@ -1,13 +1,11 @@
 import { useBuses, useDeleteBus } from '../../services/buses/hooks';
 import ModalBuses from '../../components/ModalBuses';
+import LoadingSkeleton from '../../components/LoadingSkeleton';
+import ErrorBox from '../../components/ErrorBox';
 
 import { useState } from 'react';
 
 const Buses = () => {
-
-  
-
-  
 
   const { data: busesData, isLoading, isError, error, refetch } = useBuses();
   const deleteMutation = useDeleteBus();
@@ -15,6 +13,8 @@ const Buses = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedBus, setSelectedBus] = useState(null);
   const [alert, setAlert] = useState(null);
+
+  console.log('Buses data:', busesData);
 
   const buses = Array.isArray(busesData) ? busesData : [];
 
@@ -37,17 +37,16 @@ const Buses = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-700">Cargando buses...</div>
+      <div className="min-h-screen p-6">
+        <LoadingSkeleton variant="table" />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="text-red-600 mb-4">Error cargando buses: {error?.message || 'Unknown'}</div>
-        <button onClick={() => refetch()} className="px-4 py-2 bg-blue-600 text-white rounded">Reintentar</button>
+      <div className="min-h-screen p-6">
+        <ErrorBox title="Error cargando buses" message={error?.message || 'Error desconocido'} onRetry={() => refetch()} details={error} />
       </div>
     );
   }
@@ -128,6 +127,9 @@ const Buses = () => {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                     Aire Acond.
                   </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                    Activo
+                  </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Acciones
                   </th>
@@ -146,6 +148,11 @@ const Buses = () => {
                         <div><span className="font-semibold">Aire Acond.:</span>
                           <span className={`ml-1 ${bus.aire_acondicionado ? 'text-green-600' : 'text-red-600'}`}>
                             {bus.aire_acondicionado ? 'Sí' : 'No'}
+                          </span>
+                        </div>
+                        <div><span className="font-semibold">Activo:</span>
+                          <span className={`ml-1 ${bus.activo ? 'text-green-600' : 'text-red-600'}`}>
+                            {bus.activo ? 'Sí' : 'No'}
                           </span>
                         </div>
                       </div>
@@ -181,6 +188,17 @@ const Buses = () => {
                             <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                           </svg>
                           No
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                      {bus.activo ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Activo
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Inactivo
                         </span>
                       )}
                     </td>
