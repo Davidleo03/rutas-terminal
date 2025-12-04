@@ -5,19 +5,97 @@ const Table = () => {
 
   // Datos de ejemplo para las tarifas
   const [fareData] = useState({
-    urbanas: [
-      { id: 1, origen: 'Terminal Central', destino: 'Centro Histórico', precio: '$2.500', duracion: '25 min', frecuencia: 'Cada 10 min', tipo: 'Urbana' },
-      { id: 2, origen: 'Terminal Central', destino: 'Zona Norte', precio: '$3.000', duracion: '35 min', frecuencia: 'Cada 15 min', tipo: 'Urbana' },
-      { id: 3, origen: 'Terminal Central', destino: 'Zona Sur', precio: '$2.800', duracion: '30 min', frecuencia: 'Cada 12 min', tipo: 'Urbana' },
-      { id: 4, origen: 'Terminal Central', destino: 'Zona Este', precio: '$3.200', duracion: '40 min', frecuencia: 'Cada 20 min', tipo: 'Urbana' },
-      { id: 5, origen: 'Terminal Central', destino: 'Zona Oeste', precio: '$2.700', duracion: '28 min', frecuencia: 'Cada 8 min', tipo: 'Urbana' },
+    urbanas: [{
+      id: 1,
+      origen: 'Terminal',
+      destino: 'UNERG (Sede Principal)',
+      precio: 'Bs. 20 - 40 (Ref.)',
+      frecuencia: 'Cada 10 - 15 min',
+      tipo: 'Urbana'
+    },
+    {
+      id: 2,
+      origen: 'Terminal',
+      destino: 'Centro / Plaza Bolívar',
+      precio: 'Bs. 40 (Ref.)',
+      duracion: '15 - 20 min',
+      frecuencia: 'Cada 5 - 10 min',
+      tipo: 'Urbana'
+    },
+    {
+      id: 3,
+      origen: 'Terminal',
+      destino: 'Urbanización Rómulo Gallegos',
+      precio: 'Bs. 40 (Ref.)',
+      duracion: '25 min',
+      frecuencia: 'Cada 15 min',
+      tipo: 'Urbana'
+    },
+    {
+      id: 4,
+      origen: 'Terminal',
+      destino: 'San José de Tiznados (Corta)',
+      precio: 'Bs. 40 (Ref.)',
+      duracion: '30 min',
+      frecuencia: 'Cada 20 min',
+      tipo: 'Urbana'
+    },
+    {
+      id: 5,
+      origen: 'Terminal',
+      destino: 'Villa Olímpica - Cerro de la Cruz',
+      precio: 'Bs. 40 (Ref.)',
+      duracion: '20 min',
+      frecuencia: 'Cada 15 min',
+      tipo: 'Urbana'
+    },
     ],
     extraurbanas: [
-      { id: 1, origen: 'Ciudad A', destino: 'Ciudad B', precio: '$25.000', duracion: '2h 30m', frecuencia: 'Cada 30 min', tipo: 'Extraurbana' },
-      { id: 2, origen: 'Ciudad A', destino: 'Ciudad C', precio: '$35.000', duracion: '3h 15m', frecuencia: 'Cada 45 min', tipo: 'Extraurbana' },
-      { id: 3, origen: 'Ciudad A', destino: 'Ciudad D', precio: '$42.000', duracion: '4h 00m', frecuencia: 'Cada 1h', tipo: 'Extraurbana' },
-      { id: 4, origen: 'Ciudad A', destino: 'Ciudad E', precio: '$28.000', duracion: '2h 00m', frecuencia: 'Cada 20 min', tipo: 'Extraurbana' },
-      { id: 5, origen: 'Ciudad A', destino: 'Ciudad F', precio: '$38.000', duracion: '3h 30m', frecuencia: 'Cada 1h 30m', tipo: 'Extraurbana' },
+      {
+        id: 1,
+        origen: 'San Juan de los Morros',
+        destino: 'Maracay (Edo. Aragua)',
+        precio: '$3 - $5 (Ref.)',
+        duracion: '1h 30m - 2h',
+        frecuencia: 'Cada 30 min - 1h',
+        tipo: 'Extraurbana'
+      },
+      {
+        id: 2,
+        origen: 'San Juan de los Morros',
+        destino: 'Valencia (Edo. Carabobo)',
+        precio: '$5 - $7 (Ref.)',
+        duracion: '2h 30m - 3h',
+        frecuencia: 'Variada',
+        tipo: 'Extraurbana'
+      },
+      {
+        id: 3,
+        origen: 'San Juan de los Morros',
+        destino: 'Caracas (Terminal La Bandera)',
+        precio: '$7 - $10 (Ref.)',
+        duracion: '3h 30m - 4h 30m',
+        frecuencia: 'Variada',
+        tipo: 'Extraurbana'
+      },
+      {
+        id: 4,
+        origen: 'San Juan de los Morros',
+        destino: 'Calabozo (Edo. Guárico)',
+        precio: '$5 - $8 (Ref.)',
+        duracion: '2h - 2h 30m',
+        frecuencia: 'Variada',
+        tipo: 'Extraurbana'
+      },
+      {
+        id: 5,
+        origen: 'San Juan de los Morros',
+        destino: 'Villa de Cura (Edo. Aragua)',
+        precio: '$2 - $3 (Ref.)',
+        duracion: '30 min - 45 min',
+        frecuencia: 'Cada 20 - 30 min',
+        tipo: 'Extraurbana'
+      },
     ]
   });
 
@@ -41,34 +119,31 @@ const Table = () => {
           <div className="flex justify-center space-x-4">
             <button
               onClick={() => setTipoRuta('urbanas')}
-              className={`px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${
-                tipoRuta === 'urbanas'
+              className={`px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${tipoRuta === 'urbanas'
                   ? 'bg-teal-700 text-white shadow-md'
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
+                }`}
             >
               🚌 Rutas Urbanas
             </button>
             <button
               onClick={() => setTipoRuta('extraurbanas')}
-              className={`px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${
-                tipoRuta === 'extraurbanas'
+              className={`px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${tipoRuta === 'extraurbanas'
                   ? 'bg-green-600 text-white shadow-md'
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
+                }`}
             >
               🚍 Rutas Extraurbanas
             </button>
           </div>
-          
+
           {/* Indicador de ruta seleccionada */}
           <div className="text-center mt-3">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-              tipoRuta === 'urbanas' 
-                ? 'bg-teal-700 text-sky-100' 
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${tipoRuta === 'urbanas'
+                ? 'bg-teal-700 text-sky-100'
                 : 'bg-green-100 text-green-800'
-            }`}>
-              {tipoRuta === 'urbanas' ? '🚌' : '🚍'} 
+              }`}>
+              {tipoRuta === 'urbanas' ? '🚌' : '🚍'}
               Mostrando {tipoRuta === 'urbanas' ? 'Rutas Urbanas' : 'Rutas Extraurbanas'}
             </span>
           </div>
@@ -78,7 +153,7 @@ const Table = () => {
         <div className="bg-blue-50 px-4 py-3 border-b border-blue-100">
           <div className="text-center">
             <p className="text-sm text-blue-700">
-              {tipoRuta === 'urbanas' 
+              {tipoRuta === 'urbanas'
                 ? 'Rutas dentro del área metropolitana - Precios fijos'
                 : 'Rutas hacia otras ciudades - Precios según distancia'
               }
@@ -130,11 +205,10 @@ const Table = () => {
                     {fare.frecuencia}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      fare.tipo === 'Urbana' 
-                        ? 'bg-blue-100 text-blue-800' 
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${fare.tipo === 'Urbana'
+                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-green-100 text-green-800'
-                    }`}>
+                      }`}>
                       {fare.tipo}
                     </span>
                   </td>
@@ -154,11 +228,10 @@ const Table = () => {
                     <h3 className="text-lg font-semibold text-gray-900">
                       {fare.origen} → {fare.destino}
                     </h3>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${
-                      fare.tipo === 'Urbana' 
-                        ? 'bg-blue-100 text-blue-800' 
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${fare.tipo === 'Urbana'
+                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-green-100 text-green-800'
-                    }`}>
+                      }`}>
                       {fare.tipo}
                     </span>
                   </div>
@@ -166,7 +239,7 @@ const Table = () => {
                     {fare.precio}
                   </span>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
                   <div className="flex items-center">
                     <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,7 +262,7 @@ const Table = () => {
         {/* Footer informativo */}
         <div className="bg-gray-50 px-4 py-3 sm:px-6">
           <p className="text-xs text-gray-500 text-center">
-            {tipoRuta === 'urbanas' 
+            {tipoRuta === 'urbanas'
               ? '* Rutas urbanas operan de 5:00 AM a 11:00 PM'
               : '* Reservas recomendadas para rutas extraurbanas'
             }

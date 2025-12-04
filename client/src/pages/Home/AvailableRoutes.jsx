@@ -11,21 +11,7 @@ const AvailableRoutes = () => {
   const {
     rutasCargando,
     rutasFiltradas,
-    empresas,
-    andenes,
-    servicios,
-    searchTerm,
-    setSearchTerm,
-    filtroServicio,
-    setFiltroServicio,
-    filtroAnden,
-    setFiltroAnden,
-    filtroEmpresa,
-    setFiltroEmpresa,
-    filtroPrecio,
-    setFiltroPrecio,
-    filtroEstadoCarga,
-    setFiltroEstadoCarga,
+    
     limpiarFiltros,
   } = useRoutesFilter();
 
@@ -38,24 +24,7 @@ const AvailableRoutes = () => {
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <Header title={"🚍 Rutas Cargando Pasajeros - Extraurbanas"} subtitle={"Información en tiempo real de salidas próximas"} />
 
-        <Filters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          servicios={servicios}
-          filtroServicio={filtroServicio}
-          setFiltroServicio={setFiltroServicio}
-          andenes={andenes}
-          filtroAnden={filtroAnden}
-          setFiltroAnden={setFiltroAnden}
-          empresas={empresas}
-          filtroEmpresa={filtroEmpresa}
-          setFiltroEmpresa={setFiltroEmpresa}
-          filtroPrecio={filtroPrecio}
-          setFiltroPrecio={setFiltroPrecio}
-          filtroEstadoCarga={filtroEstadoCarga}
-          setFiltroEstadoCarga={setFiltroEstadoCarga}
-          limpiarFiltros={limpiarFiltros}
-        />
+        
 
         <div className="bg-orange-50 px-4 py-3 border-b border-orange-100">
           <div className="flex flex-wrap justify-center gap-4 text-sm text-orange-700">
