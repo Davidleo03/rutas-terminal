@@ -13,6 +13,7 @@ class RutasController {
     static async createRuta(req, res) {
         try {
             const rutaData = req.body;
+            
             await RutasModel.createRuta(rutaData);
             res.status(201).json({ msg : 'Ruta creada exitosamente' });
         } catch (error) {

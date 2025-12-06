@@ -1,24 +1,53 @@
-import { useRutas } from "../../services/Rutas/hooks";
+import { useRutas, useCreateRuta, useUpdateRuta, useDeleteRuta } from "../../services/Rutas/hooks";
+import { useState, useEffect } from 'react';
+import ModalRutas from '../../components/ModalRutas';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 const Rutas = () => {
-  console.log('Admin Rutas page rendered');
+  
 
   // Obtener rutas desde la API usando react-query
   const { data: rutas = [], isLoading, isError, error, refetch } = useRutas();
 
   const handleEditar = (id_ruta) => {
-    console.log('Editar ruta:', id_ruta);
-    // Lógica para editar
+    
+    const ruta = rutas.find(r => r.id_ruta === id_ruta);
+    if (ruta) setEditing(ruta);
+    setOpenModal(true);
   };
 
-  const handleEliminar = (id_ruta) => {
-    console.log('Eliminar ruta:', id_ruta);
-    // Lógica para eliminar
-  };
 
   const handleRegistrar = () => {
     console.log('Registrar nueva ruta');
-    // Lógica para registrar nueva ruta
+    setEditing(null);
+    setOpenModal(true);
+  };
+
+  // modal state and mutations
+  const [openModal, setOpenModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const createMutation = useCreateRuta();
+  const updateMutation = useUpdateRuta();
+  const deleteMutation = useDeleteRuta();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
+  const [actionAlert, setActionAlert] = useState(null);
+
+  const handleModalSubmit = async (payload, initialData) => {
+    if (initialData && initialData.id_ruta) {
+      // update
+      await updateMutation.mutateAsync({ id: initialData.id_ruta, ruta: payload });
+    } else {
+      // create
+      await createMutation.mutateAsync({ ruta: payload });
+    }
+  };
+
+  const handleModalDone = (res) => {
+    // after create/update; react-query invalidation will refresh the list, but we can refetch as well
+    if (res?.type === 'success') {
+      refetch();
+    }
   };
 
   const handleToggleActiva = (id_ruta, estadoActual) => {
@@ -26,10 +55,32 @@ const Rutas = () => {
     // Lógica para cambiar estado activa/inactiva
   };
 
-  // Función para formatear hora
-  const formatHora = (hora) => {
-    return hora ? hora.substring(0, 5) : '--:--';
+  const handleEliminar = (id_ruta) => {
+    if (!id_ruta) return;
+    const ruta = rutas.find(r => r.id_ruta === id_ruta);
+    console.log(ruta)
+    setToDelete({ id: id_ruta});
+    setConfirmOpen(true);
   };
+
+  const confirmDelete = () => {
+    if (!toDelete) return;
+    deleteMutation.mutate(toDelete);
+    setConfirmOpen(false);
+  };
+
+  useEffect(() => {
+    if (deleteMutation.isSuccess) {
+      setActionAlert({ type: 'success', message: 'Ruta eliminada correctamente.' });
+      setTimeout(() => setActionAlert(null), 3000);
+      // refetch handled by react-query invalidation in hook
+    }
+
+    if (deleteMutation.isError) {
+      setActionAlert({ type: 'error', message: String(deleteMutation.error?.message || deleteMutation.error || 'Error al eliminar') });
+      setTimeout(() => setActionAlert(null), 5000);
+    }
+  }, [deleteMutation.isSuccess, deleteMutation.isError]);
 
   // Función para formatear duración
   const formatDuracion = (duracion) => {
@@ -41,9 +92,21 @@ const Rutas = () => {
     return duracion;
   };
 
-  // Función para formatear precio
-  const formatPrecio = (precio) => {
-    return `$${precio?.toFixed(2) || '0.00'}`;
+  // Mostrar destino con prefijo según tipo de empresa
+  const displayDestino = (ruta) => {
+    
+    const tipo = String(ruta?.empresa?.tipo_ruta).toLowerCase();
+    
+    if (tipo.includes('extra-urbana')) return `San Juan/ ${ruta.destino}`;
+    if (tipo.includes('urbana')) return `Terminal/ ${ruta.destino}`;
+    
+    return ruta.destino;
+  };
+
+  // Función para formatear precio con moneda
+  const formatPrecio = (precio, moneda = 'bs') => {
+    const symbol = moneda === '$' ? '$' : 'Bs ';
+    return `${symbol}${(precio != null ? Number(precio).toFixed(2) : '0.00')}`;
   };
 
   // Función para formatear fecha
@@ -62,6 +125,11 @@ const Rutas = () => {
         className="min-h-screen bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/images/admin.jpg')" }}
       >
+        {actionAlert && (
+          <div className={`fixed top-4 right-4 z-40 px-4 py-2 rounded ${actionAlert.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+            {actionAlert.message}
+          </div>
+        )}
         <div className="min-h-screen bg-black/50 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto p-4 sm:p-6">
             <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg">
@@ -109,15 +177,20 @@ const Rutas = () => {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                   Empresa
                 </th>
+                
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  Horario
+                  Duración
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
                   Detalles
                 </th>
+
+                
+
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Estado
                 </th>
+
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Acciones
                 </th>
@@ -132,7 +205,7 @@ const Rutas = () => {
                         <span className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded mr-2">
                           ID: {ruta.id_ruta}
                         </span>
-                        <span className="text-sm font-medium text-gray-900">{ruta.destino}</span>
+                        <span className="text-sm font-medium text-gray-900">{displayDestino(ruta)}</span>
                       </div>
                       
                       {/* Información para móviles */}
@@ -143,17 +216,17 @@ const Rutas = () => {
                           </svg>
                           {ruta.empresa.nombre_empresa}
                         </div>
-                        <div className="flex items-center text-xs text-gray-600">
-                          <svg className="w-3 h-3 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {formatHora(ruta.hora_salida)} • {formatDuracion(ruta.duracion_estimada)}
-                        </div>
+                                <div className="flex items-center text-xs text-gray-600">
+                                  <svg className="w-3 h-3 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  {formatDuracion(ruta.duracion_estimada)}
+                                </div>
                         <div className="flex items-center text-xs text-gray-600">
                           <svg className="w-3 h-3 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                           </svg>
-                          {formatPrecio(ruta.precio)} • {ruta.tipo_servicio || 'Regular'}
+                          {formatPrecio(ruta.precio, ruta.moneda)} • {ruta.tipo_servicio || 'Regular'}
                         </div>
                         <div className="text-xs text-gray-500">
                           Creada: {formatFecha(ruta.fecha_creacion)}
@@ -168,11 +241,10 @@ const Rutas = () => {
                     <div className="text-xs text-gray-500">{ruta.empresa.tipo_ruta}</div>
                   </td>
 
-                  {/* Horario - Desktop */}
+                  {/* Horario - Desktop (mostrar solo duración ahora que hora_salida fue removida) */}
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                     <div className="flex flex-col">
-                      <div className="font-medium text-gray-900">{formatHora(ruta.hora_salida)}</div>
-                      <div className="text-xs text-gray-500">{formatDuracion(ruta.duracion_estimada)}</div>
+                      <div className="font-medium text-gray-900">{formatDuracion(ruta.duracion_estimada)}</div>
                     </div>
                   </td>
 
@@ -181,7 +253,7 @@ const Rutas = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <div className="text-xs text-gray-500">Precio</div>
-                        <div className="font-medium text-green-600">{formatPrecio(ruta.precio)}</div>
+                        <div className="font-medium text-green-600">{formatPrecio(ruta.precio, ruta.moneda)}</div>
                       </div>
                       <div>
                         <div className="text-xs text-gray-500">Servicio</div>
@@ -191,7 +263,7 @@ const Rutas = () => {
                               ? 'bg-purple-100 text-purple-800'
                               : 'bg-blue-100 text-blue-800'
                           }`}>
-                            {ruta.tipo_servicio || 'Regular'}
+                            {ruta.tipo_servicio || 'Parada Corta'}
                           </span>
                         </div>
                       </div>
@@ -304,7 +376,23 @@ const Rutas = () => {
           </div>
         </div>
       </div>
-    </>
+        <ModalRutas
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          initialData={editing}
+          onSubmit={handleModalSubmit}
+          onDone={handleModalDone}
+        />
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Eliminar ruta"
+          description={`¿Estás seguro que deseas eliminar la ruta "${toDelete?.label || ''}"? Esta acción no se puede deshacer.`}
+          onCancel={() => setConfirmOpen(false)}
+          onConfirm={confirmDelete}
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+        />
+      </>
   );
 };
 

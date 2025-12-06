@@ -14,7 +14,7 @@ const Buses = () => {
   const [selectedBus, setSelectedBus] = useState(null);
   const [alert, setAlert] = useState(null);
 
-  console.log('Buses data:', busesData);
+  
 
   const buses = Array.isArray(busesData) ? busesData : [];
 
