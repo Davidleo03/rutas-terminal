@@ -187,7 +187,7 @@ const ModalRutas = ({ open, onClose, initialData = null, onSubmit, onDone }) => 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Destino</label>
-                <input name="destino" value={form.destino} onChange={handleChange} placeholder="Ej: Terminal Central - Playa" className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-200 ${errors.destino ? 'border-red-500' : 'border-gray-200'}`} />
+                <input name="destino" value={form.destino} onChange={handleChange} placeholder="Ej: Maracay" className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-200 ${errors.destino ? 'border-red-500' : 'border-gray-200'}`} />
                 {errors.destino && <div className="text-red-600 text-sm mt-1">{errors.destino}</div>}
               </div>
 
