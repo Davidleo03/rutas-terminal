@@ -338,14 +338,7 @@ const Rutas = () => {
             <div className="text-sm text-gray-700 mb-2 sm:mb-0">
               Mostrando <span className="font-medium">{rutas.length}</span> rutas
             </div>
-            <div className="flex items-center space-x-2">
-              <button className="px-3 py-1 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-                Anterior
-              </button>
-              <button className="px-3 py-1 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-                Siguiente
-              </button>
-            </div>
+            
           </div>
         </div>
       </div>
