@@ -5,7 +5,7 @@ import { useUsuarios, useCreateUsuario, useDeleteUsuario } from '../../services/
 import ConfirmDialog from '../../components/ConfirmDialog';
 
 const Usuarios = () => {
-  
+
   const [openModal, setOpenModal] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -28,7 +28,7 @@ const Usuarios = () => {
   const usuarios = Array.isArray(usuariosData) ? usuariosData : [];
 
   const handleEditar = (id_usuario) => {
-    
+
     // Lógica para editar
   };
 
@@ -207,10 +207,10 @@ const Usuarios = () => {
             Inactivos ({estadisticasUsuarios.inactivos})
           </button>
           {Object.entries(estadisticasUsuarios.porRol).map(([rol, cantidad]) => (
-            <button 
-              key={rol} 
+            <button
+              key={rol}
               className="px-3 py-1 text-sm rounded-full hover:opacity-90 transition-opacity"
-              style={{ 
+              style={{
                 backgroundColor: getColorRol(rol).split(' ')[0].replace('bg-', 'bg-').replace('100', '50'),
                 color: getColorRol(rol).split(' ')[1].replace('text-', 'text-').replace('800', '700')
               }}
@@ -263,7 +263,7 @@ const Usuarios = () => {
                             <div className="text-xs text-gray-500">ID: {usuario.id_usuario}</div>
                           </div>
                         </div>
-                        
+
                         {/* Información para móviles */}
                         <div className="mt-3 space-y-2 md:hidden">
                           <div>
@@ -275,13 +275,16 @@ const Usuarios = () => {
                               </span>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-2 gap-2">
                             <div>
                               <div className="text-xs text-gray-500">Empresa ID</div>
                               <div className="text-sm font-medium text-gray-900">
                                 {usuario.id_empresa || 'N/A'}
                               </div>
+                            </div>
+                            <div className="bg-green-200 rounded-2xl p-0.5 text-xs text-gray-500  text-center flex items-center">
+                              <p className='ml-4'>{usuario?.empresa?.nombre_empresa}</p>
                             </div>
                             <div>
                               <div className="text-xs text-gray-500">Auth ID</div>
@@ -290,7 +293,7 @@ const Usuarios = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div>
                             <div className="text-xs text-gray-500">Creación</div>
                             <div className="text-xs text-gray-500">{formatFecha(usuario.fecha_creacion)}</div>
@@ -314,6 +317,9 @@ const Usuarios = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
                             Empresa ID: {usuario.id_empresa || 'Ninguna'}
+                          </div>
+                          <div className="bg-green-200 rounded-2xl p-0.5 text-center flex items-center">
+                            <p className='ml-4'>{usuario?.empresa?.nombre_empresa}</p>
                           </div>
                         </div>
                       </div>
@@ -340,11 +346,10 @@ const Usuarios = () => {
                       <div className="flex flex-col items-start space-y-2">
                         <button
                           onClick={() => handleToggleActivo(usuario.id_usuario, usuario.activo)}
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
-                            usuario.activo
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${usuario.activo
                               ? 'bg-green-100 text-green-800 hover:bg-green-200'
                               : 'bg-red-100 text-red-800 hover:bg-red-200'
-                          }`}
+                            }`}
                         >
                           <svg className={`w-3 h-3 mr-1 ${usuario.activo ? 'text-green-600' : 'text-red-600'}`} fill="currentColor" viewBox="0 0 20 20">
                             {usuario.activo ? (
@@ -355,8 +360,8 @@ const Usuarios = () => {
                           </svg>
                           {usuario.activo ? 'Activo' : 'Inactivo'}
                         </button>
-                        
-                        
+
+
                       </div>
                     </td>
 
@@ -364,7 +369,7 @@ const Usuarios = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex flex-col space-y-2">
                         <div className="flex items-center space-x-2">
-                          
+
                           <button
                             onClick={() => handleEliminar(usuario.id_usuario)}
                             className={`text-red-600 hover:text-red-900 transition-colors duration-200 p-2 rounded-lg hover:bg-red-50 flex items-center justify-center ${deletingId ? 'opacity-60 pointer-events-none' : ''}`}
@@ -386,7 +391,7 @@ const Usuarios = () => {
                             )}
                           </button>
                         </div>
-                        
+
                       </div>
                     </td>
                   </tr>
@@ -405,7 +410,7 @@ const Usuarios = () => {
                 {estadisticasUsuarios.activos} activos • {estadisticasUsuarios.inactivos} inactivos
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -434,37 +439,37 @@ const Usuarios = () => {
         </div>
       )}
 
-  {/* Modal para crear usuario */}
-  <ModalNuevoUsuario open={openModal} onClose={() => setOpenModal(false)} onCreate={handleCreateUser} submitting={creating} serverError={createError} />
+      {/* Modal para crear usuario */}
+      <ModalNuevoUsuario open={openModal} onClose={() => setOpenModal(false)} onCreate={handleCreateUser} submitting={creating} serverError={createError} />
 
-  {/* Confirm dialog para eliminar usuario */}
-  <ConfirmDialog
-    open={confirmOpen}
-    title="Eliminar usuario"
-    description="¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer."
-    onCancel={() => { setConfirmOpen(false); setToDelete(null); }}
-    onConfirm={handleConfirmDelete}
-    confirmLabel="Eliminar"
-    cancelLabel="Cancelar"
-  />
+      {/* Confirm dialog para eliminar usuario */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Eliminar usuario"
+        description="¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer."
+        onCancel={() => { setConfirmOpen(false); setToDelete(null); }}
+        onConfirm={handleConfirmDelete}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+      />
 
-  {/* Toasters locales */}
-  <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
-    {toasts.map((t) => (
-      <div key={t.id} className={`max-w-sm w-full px-4 py-3 rounded shadow ${t.type === 'success' ? 'bg-green-50 border border-green-100 text-green-800' : t.type === 'error' ? 'bg-rose-50 border border-rose-100 text-rose-800' : 'bg-gray-50 border border-gray-100 text-gray-800'}`}>
-        {t.message}
+      {/* Toasters locales */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+        {toasts.map((t) => (
+          <div key={t.id} className={`max-w-sm w-full px-4 py-3 rounded shadow ${t.type === 'success' ? 'bg-green-50 border border-green-100 text-green-800' : t.type === 'error' ? 'bg-rose-50 border border-rose-100 text-rose-800' : 'bg-gray-50 border border-gray-100 text-gray-800'}`}>
+            {t.message}
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
 
-  {/* Centered success message */}
-  {centerMessage && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      <div className="pointer-events-auto bg-white/95 backdrop-blur-sm border border-green-100 text-green-800 px-6 py-4 rounded-lg shadow-lg">
-        {centerMessage}
-      </div>
-    </div>
-  )}
+      {/* Centered success message */}
+      {centerMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="pointer-events-auto bg-white/95 backdrop-blur-sm border border-green-100 text-green-800 px-6 py-4 rounded-lg shadow-lg">
+            {centerMessage}
+          </div>
+        </div>
+      )}
 
       {/* Información de roles */}
       <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -487,7 +492,7 @@ const Usuarios = () => {
             </span>
             <span className="text-xs text-gray-600">Admin Línea - Empresa específica</span>
           </div>
-          
+
         </div>
       </div>
     </div>

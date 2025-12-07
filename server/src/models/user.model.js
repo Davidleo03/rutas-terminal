@@ -5,7 +5,7 @@ class UserModel {
   static async getAllUsers() {
     const { data, error } = await supabase
       .from('usuarios')
-      .select('*');
+      .select('*, empresa:empresas(*)');
 
     if (error) {
       throw new Error(error.message);
