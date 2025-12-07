@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import useExportPDF from '../../hooks/useExportPDF';
+import { useRutasTR } from '../../services/Rutas_RT/hooks'
 const ReportesViajes = () => {
   console.log('Reportes Rutas page rendered');
 
@@ -13,16 +14,10 @@ const ReportesViajes = () => {
     destino: ''
   });
   const { download, downloading, error } = useExportPDF();
+  // Rutas en tiempo real (preview)
+  const { data: rutas = [], isLoading: loadingRutas, error: rutasError } = useRutasTR();
 
-  // Tipos de reportes disponibles
-  const tiposReporte = [
-    { id: 1, nombre: 'Reporte General', descripcion: 'Resumen completo de todas las rutas', icono: '📊' },
-    { id: 2, nombre: 'Rutas por Empresa', descripcion: 'Análisis por empresa transportista', icono: '🏢' },
-    { id: 3, nombre: 'Ocupación por Ruta', descripcion: 'Porcentaje de ocupación por ruta', icono: '👥' },
-    { id: 4, nombre: 'Rendimiento Financiero', descripcion: 'Ingresos y rentabilidad', icono: '💰' },
-    { id: 5, nombre: 'Horarios Pico', descripcion: 'Análisis de horas de mayor demanda', icono: '⏰' },
-    { id: 6, nombre: 'Rutas Inactivas', descripcion: 'Rutas suspendidas o inactivas', icono: '⏸️' }
-  ];
+  
 
   // Datos de ejemplo para empresas
   const empresas = [
@@ -294,113 +289,59 @@ const ReportesViajes = () => {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Estado
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                  Pasajeros
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ingresos
-                </th>
+                
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {/* Fila de ejemplo 1 */}
-              <tr className="hover:bg-gray-50">
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-mono text-gray-900">16</td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">Centro</div>
-                  <div className="text-xs text-gray-500 md:hidden">Transportes C.A.</div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                  Transportes C.A.
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                    Parada Corta
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Activa
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                  <div className="flex items-center">
-                    <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: '78%' }}></div>
-                    </div>
-                    <span>78%</span>
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                  Bs. 3,240
-                </td>
-              </tr>
+              {loadingRutas ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-4 text-center text-sm text-gray-500">Cargando rutas...</td>
+                </tr>
+              ) : rutasError ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-4 text-center text-sm text-red-500">Error al cargar rutas</td>
+                </tr>
+              ) : rutas.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-4 text-center text-sm text-gray-500">No hay rutas disponibles</td>
+                </tr>
+              ) : (
+                rutas.map((trip) => {
+                  const idRuta = trip.id_ruta ?? trip.id_registro ?? '-';
+                  const destino = trip.ruta?.destino || '-';
+                  const precio = typeof trip.ruta?.precio !== 'undefined' && trip.ruta.precio !== null
+                    ? new Intl.NumberFormat('es-ES').format(trip.ruta.precio)
+                    : null;
+                  const moneda = trip.ruta?.moneda === 'bs' ? 'Bs' : (trip.ruta?.moneda || '');
+                  const destinoLabel = precio ? `${destino} (${moneda} ${precio})` : destino;
+                  const empresa = trip.ruta?.id_empresa ?? trip.bus?.empresa_id ?? '-';
+                  const tipo = trip.ruta?.tipo_servicio || '-';
+                  const activa = trip.ruta?.activa;
 
-              {/* Fila de ejemplo 2 */}
-              <tr className="hover:bg-gray-50">
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-mono text-gray-900">18</td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">Aeropuerto</div>
-                  <div className="text-xs text-gray-500 md:hidden">Express Nacional</div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                  Express Nacional
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Express
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Activa
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                  <div className="flex items-center">
-                    <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                      <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '65%' }}></div>
-                    </div>
-                    <span>65%</span>
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                  $ 1,875
-                </td>
-              </tr>
-
-              {/* Fila de ejemplo 3 */}
-              <tr className="hover:bg-gray-50">
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-mono text-gray-900">20</td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">Centro Comercial</div>
-                  <div className="text-xs text-gray-500 md:hidden">Transportes C.A.</div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                  Transportes C.A.
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Local
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    Inactiva
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                  <div className="flex items-center">
-                    <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                      <div className="bg-gray-400 h-2 rounded-full" style={{ width: '0%' }}></div>
-                    </div>
-                    <span>0%</span>
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
-                  Bs. 0
-                </td>
-              </tr>
+                  return (
+                    <tr key={trip.id_registro || trip.id_ruta} className="hover:bg-gray-50">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-mono text-gray-900">{idRuta}</td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{destinoLabel}</div>
+                        <div className="text-xs text-gray-500 md:hidden">Empresa: {empresa}</div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">{empresa}</td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          {tipo.replaceAll('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {activa ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Activa</span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactiva</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
