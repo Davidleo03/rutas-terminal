@@ -76,7 +76,7 @@ const MobileList = ({ rutas, getColorServicio, getColorEstado, formatPrecio, for
   return (
     <div className="md:hidden">
       <div className="divide-y divide-gray-200">
-        {rutas.map((rawRuta) => {
+        {rutas.map((rawRuta, i) => {
           const ruta = normalize(rawRuta);
           const porcentajeOcupacion = getPorcentajeOcupacion(
             ruta.asientos_disponibles,
@@ -84,7 +84,7 @@ const MobileList = ({ rutas, getColorServicio, getColorEstado, formatPrecio, for
           );
           
           return (
-            <div key={ruta.id_registro} className="p-4 hover:bg-gray-50 transition-colors">
+            <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
               {/* Header con información principal */}
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
@@ -165,22 +165,7 @@ const MobileList = ({ rutas, getColorServicio, getColorEstado, formatPrecio, for
                 </div>
               </div>
 
-              {/* Barra de progreso de ocupación */}
-              <div className="mt-3">
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>Disponibilidad</span>
-                  <span>{porcentajeOcupacion}% ocupado</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full ${
-                      porcentajeOcupacion < 50 ? 'bg-green-500' :
-                      porcentajeOcupacion < 80 ? 'bg-yellow-500' : 'bg-red-500'
-                    }`}
-                    style={{ width: `${porcentajeOcupacion}%` }}
-                  ></div>
-                </div>
-              </div>
+              
 
               {/* Información adicional del bus */}
               <div className="mt-3 pt-3 border-t border-gray-200">

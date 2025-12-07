@@ -15,8 +15,8 @@ const RoutesTable = ({ rutas, getColorAnden, getColorServicio, getColorProgreso,
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {rutas.map((ruta) => (
-            <tr key={ruta.id_ruta} className="hover:bg-gray-50 transition-colors border-l-4 border-orange-500">
+          {rutas.map((ruta, i) => (
+            <tr key={i} className="hover:bg-gray-50 transition-colors border-l-4 border-orange-500">
               <td className="px-6 py-4">
                 <div className="flex items-center space-x-3">
                   <div>
@@ -35,13 +35,8 @@ const RoutesTable = ({ rutas, getColorAnden, getColorServicio, getColorProgreso,
                 </div>
               </td>
               <td className="px-6 py-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 bg-gray-200 rounded-full h-2">
-                    <div className={`h-2 rounded-full transition-all duration-300 ${getColorProgreso(ruta.progresoCarga)}`} style={{ width: `${ruta.progresoCarga}%` }}></div>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">{ruta.progresoCarga}%</span>
-                </div>
-                <div className="text-xs text-gray-500 mt-1">{ruta.asientosDisponibles} asientos libres</div>
+                
+                <div className="text-xs text-gray-700 mt-1">{ruta.asientosDisponibles} asientos libres</div>
               </td>
               <td className="px-6 py-4">
                 <div className="text-sm">

@@ -37,14 +37,22 @@ const AvailableRoutes = () => {
     servicio: tr?.ruta?.tipo_servicio ?? tr?.servicio ?? '',
     serviciosAdicionales: tr?.ruta?.serviciosAdicionales ?? tr?.serviciosAdicionales ?? tr?.servicios ?? [],
     anden: tr?.anden ?? tr?.anden_nombre ?? '',
-    progresoCarga: tr?.progresoCarga ?? tr?.progreso_carga ?? tr?.progreso ?? 0,
     horaSalida: tr?.horaSalida ?? tr?.hora_salida ?? tr?.hora ?? '',
     asientosDisponibles: tr?.asientos_disponibles ?? tr?.asientosDisponibles ?? tr?.asientos ?? 0,
     empresa: tr?.ruta?.empresa_nombre ?? tr?.empresa ?? (tr?.ruta?.empresa || ''),
     tipoBus: tr?.bus?.modelo ?? tr?.tipoBus ?? '',
     servicios: tr?.servicios ?? [],
+    bus : {
+      capacidad: tr?.bus?.capacidad ?? tr?.capacidad ?? 0,
+    },
     // mantener referencia original
     __raw: tr,
+    progresoCarga: function() {
+      const capacidadTotal = tr?.bus?.capacidad ?? tr?.bus?.capacidad ?? 1;
+      const asientosOcupados = capacidadTotal - (tr.asientosDisponibles || 0);
+      console.log('Ocupacion', ((asientosOcupados / capacidadTotal) * 100));  
+      return Math.round((asientosOcupados / capacidadTotal) * 100);
+    }(),
   });
 
   const rutasParaMostrar = (Array.isArray(rutasTR) && rutasTR.length > 0)

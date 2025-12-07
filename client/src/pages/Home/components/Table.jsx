@@ -12,8 +12,6 @@ const Table = () => {
   // Datos en el nuevo formato
   const routesData = rutas  || [];
 
-  console.log('Rutas cargadas:', routesData);
-
   
 
   // Filtrar rutas según el tipo seleccionado
@@ -150,9 +148,7 @@ const Table = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Duración
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Frecuencia
-                </th>
+                
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tipo Servicio
                 </th>
@@ -162,8 +158,8 @@ const Table = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {datosActuales.map((ruta) => (
-                <tr key={ruta.id_ruta} className="hover:bg-gray-50 transition-colors">
+              {datosActuales.map((ruta, i) => (
+                <tr key={i} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {ruta.empresa.nombre_empresa}
                   </td>
@@ -176,9 +172,7 @@ const Table = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDuracion(ruta.duracion_estimada)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {getFrecuencia(ruta.tipo_servicio)}
-                  </td>
+                  
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       ruta.tipo_servicio === 'directo' 
@@ -208,8 +202,8 @@ const Table = () => {
         {/* Vista para móviles */}
         <div className="md:hidden">
           <div className="divide-y divide-gray-200">
-            {datosActuales.map((ruta) => (
-              <div key={ruta.id_ruta} className="p-4 hover:bg-gray-50 transition-colors">
+            {datosActuales.map((ruta, i) => (
+              <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">
