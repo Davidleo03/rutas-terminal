@@ -1,46 +1,64 @@
-// useRouteColors.js
-// Encapsula la lógica de colores y formateo para las rutas
-export default function useRouteColors() {
-  const getColorServicio = (servicio) => {
-    return servicio === 'Directo'
-      ? 'bg-purple-100 text-purple-800'
-      : 'bg-orange-100 text-orange-800';
+// En useRouteColors.js
+const useRouteColors = () => {
+  const getColorServicio = (tipoServicio) => {
+    const colores = {
+      'directo': 'text-purple-600 bg-purple-100',
+      'parada_corta': 'text-orange-600 bg-orange-100',
+      'parada_larga': 'text-blue-600 bg-blue-100',
+      'express': 'text-red-600 bg-red-100'
+    };
+    return colores[tipoServicio] || 'text-gray-600 bg-gray-100';
   };
 
+  const getColorEstado = (asientosDisponibles, capacidad) => {
+    const porcentaje = (asientosDisponibles / capacidad) * 100;
+    if (porcentaje > 50) return 'text-green-600 bg-green-100';
+    if (porcentaje > 20) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
+  };
+
+  // Color para el andén (estética simple según prefijo)
   const getColorAnden = (anden) => {
-    const parts = String(anden).split(' ');
-    const numeroAnden = parseInt(parts[1]) || 1;
-    const colors = [
-      'bg-red-100 text-red-800',
-      'bg-blue-100 text-blue-800',
-      'bg-green-100 text-green-800',
-      'bg-yellow-100 text-yellow-800',
-      'bg-indigo-100 text-indigo-800',
-      'bg-pink-100 text-pink-800',
-      'bg-teal-100 text-teal-800',
-      'bg-cyan-100 text-cyan-800'
-    ];
-    return colors[(numeroAnden - 1) % colors.length];
+    if (!anden) return 'text-gray-600 bg-gray-100';
+    const a = String(anden).toLowerCase();
+    if (a.includes('a')) return 'text-purple-600 bg-purple-100';
+    if (a.includes('b')) return 'text-blue-600 bg-blue-100';
+    if (a.includes('c')) return 'text-green-600 bg-green-100';
+    return 'text-gray-600 bg-gray-100';
   };
 
-  const getColorProgreso = (progreso) => {
-    if (progreso >= 80) return 'bg-green-600';
-    if (progreso >= 50) return 'bg-yellow-500';
-    return 'bg-blue-500';
+  // Color para barra de progreso según porcentaje
+  const getColorProgreso = (porcentaje) => {
+    const p = Number(porcentaje) || 0;
+    if (p >= 75) return 'bg-green-500';
+    if (p >= 50) return 'bg-yellow-400';
+    if (p >= 25) return 'bg-orange-400';
+    return 'bg-red-500';
   };
 
-  const formatPrecio = (precio) => {
-    try {
-      return `$${Number(precio).toLocaleString('es-CO')}`;
-    } catch (e) {
-      return String(precio);
-    }
+  const formatPrecio = (precio, moneda) => {
+    // Normalizar moneda por defecto a 'bs' si no se proporciona
+    const m = moneda || 'bs';
+    if (precio == null || precio === '') return '-';
+    const simbolo = m === 'bs' ? 'Bs.' : m === '$' ? 'USD $' : `${m}`;
+    // Mostrar siempre con 2 decimales
+    const num = Number(precio);
+    const formatted = Number.isNaN(num) ? String(precio) : num.toFixed(2);
+    return `${simbolo} ${formatted}`;
   };
 
-  return {
-    getColorServicio,
-    getColorAnden,
-    getColorProgreso,
-    formatPrecio
+  const formatDuracion = (duracion) => {
+    const [horas, minutos] = duracion.split(':');
+    const horasNum = parseInt(horas);
+    const minutosNum = parseInt(minutos);
+    
+    if (horasNum === 0) return `${minutosNum} min`;
+    if (minutosNum === 0) return `${horasNum} h`;
+    return `${horasNum} h ${minutosNum} min`;
   };
-}
+
+  return { getColorServicio, getColorEstado, getColorAnden, getColorProgreso, formatPrecio, formatDuracion };
+};
+
+
+export default useRouteColors;

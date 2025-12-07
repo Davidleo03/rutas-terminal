@@ -27,6 +27,31 @@ class UserController {
       res.status(500).json({ message: 'Error al crear el usuario' });
     }
   }
+
+  static async updateUser(req, res) {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      const updatedUser = await UserModel.updateUser(id, updates);
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      const { message } = error;
+      console.error(`Ha ocurrido un error al actualizar el usuario: ${message}`);
+      res.status(500).json({ message: 'Error al actualizar el usuario' });
+    }
+  } 
+
+  static async deleteUser(req, res) {
+    try {
+      const { id } = req.params;
+      await UserModel.deleteUserById(id);
+      res.status(200).json({ message: 'Usuario eliminado correctamente' });
+    } catch (error) {
+      const { message } = error;
+      console.error(`Ha ocurrido un error al eliminar el usuario: ${message}`);
+      res.status(500).json({ message: 'Error al eliminar el usuario' });
+    }   
+  }
 }
 
 export default UserController;

@@ -1,36 +1,53 @@
-
 import { useBuses } from "../../services/buses/hooks";
+import { useRutas }from "../../services/Rutas/hooks";
+import ModalRutas from '../../components/ModalRutas';
+import ModalBuses from '../../components/ModalBuses';
+import { useState } from 'react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import ErrorBox from '../../components/ErrorBox';
 
-
 const Admin = () => {
-  
-
-  
-  
-
-  const rutasRecientes = [
-    { id: 1, nombre: "Ruta Centro - Este", empresa: "Transportes C.A.", estado: "Activa", pasajerosDia: 245 },
-    { id: 2, nombre: "Ruta Norte - Sur", empresa: "Logística Express", estado: "Activa", pasajerosDia: 189 },
-    { id: 3, nombre: "Ruta Express", empresa: "Delivery Rápido", estado: "Inactiva", pasajerosDia: 0 },
-  ];
-
-  const { data: buses,  isLoading: isLoadingBuses, isError: isErrorBuses, error: errorBuses, refetch } = useBuses();
+  const { data: rutas, isLoading: isLoadingRutas, isError: isErrorRutas, error: errorRutas, refetch: refetchRutas } = useRutas();
 
 
+  // Datos de rutas en el nuevo formato
+  const rutasRecientes = rutas ? rutas.slice(-3).reverse() : [];
+
+  const { data: buses, isLoading: isLoadingBuses, isError: isErrorBuses, error: errorBuses, refetch: refetchBuses } = useBuses();
+  const [showRutaModal, setShowRutaModal] = useState(false);
+  const [showBusModal, setShowBusModal] = useState(false);
+  const [alert, setAlert] = useState(null);
 
   const busesRecientes = buses ? buses.slice(-3).reverse() : [];
-
   const busesDisponibles = buses ? buses.filter(bus => bus.activo).length : 0;
 
   const estadisticas = {
-    totalRutas: 24,
+    totalRutas: rutasRecientes.length, // Actualizado para usar el array de rutas
     totalBuses: buses ? buses.length : 0,
     busesDisponibles: busesDisponibles,
     ocupacionPromedio: 78,
     ingresosMes: 12540
   };
+
+  if (isLoadingRutas) {
+    return (
+      <div className="p-4 sm:p-6">
+        <LoadingSkeleton />
+      </div>
+    );
+  }
+
+  if (isErrorRutas) {   
+    return (
+      <div className="p-6">
+        <ErrorBox
+          title="Error cargando métricas"
+          message={errorRutas?.message || 'Error desconocido'}
+          details={errorRutas}
+        />
+      </div>
+    );
+  }
 
   if (isLoadingBuses) {
     return (
@@ -43,13 +60,42 @@ const Admin = () => {
   if (isErrorBuses) {
     return (
       <div className="p-6">
-        <ErrorBox title="Error cargando métricas" message={errorBuses?.message || 'Error desconocido'} onRetry={() => refetch()} details={errorBuses} />
+        <ErrorBox 
+          title="Error cargando métricas" 
+          message={errorBuses?.message || 'Error desconocido'} 
+          onRetry={() => refetch()} 
+          details={errorBuses} 
+        />
       </div>
     );
   }
-  
 
+  // Función para formatear la duración estimada
+  const formatDuracion = (duracion) => {
+    const [horas, minutos] = duracion.split(':');
+    return `${horas}h ${minutos}min`;
+  };
 
+  // Función para formatear el tipo de servicio
+  const formatTipoServicio = (tipo) => {
+    const tipos = {
+      'parada_corta': 'Parada Corta',
+      'parada_larga': 'Parada Larga',
+      'directo': 'Directo',
+      'express': 'Express'
+    };
+    return tipos[tipo] || tipo;
+  };
+
+  // Función para formatear el tipo de ruta
+  const formatTipoRuta = (tipo) => {
+    const tipos = {
+      'urbana': 'Urbana',
+      'extra-urbana': 'Extra Urbana',
+      'interurbana': 'Interurbana'
+    };
+    return tipos[tipo] || tipo;
+  };
 
   return (
     <div className="p-4 sm:p-6">
@@ -84,7 +130,8 @@ const Admin = () => {
             </svg>
           </div>
         </div>
-         <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg p-4 text-white shadow-lg">
+
+        <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg p-4 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-amber-100 text-sm">Buses Disponibles</p>
@@ -95,14 +142,7 @@ const Admin = () => {
             </svg>
           </div>
         </div>
-
       </div>
-
-        
-
-        
-
-       
 
       {/* Grid de Tablas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -117,28 +157,48 @@ const Admin = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ruta
+                    Destino
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                     Empresa
                   </th>
-                  
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Precio
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                    Tipo
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {rutasRecientes.map((ruta) => (
-                  <tr key={ruta.id} className="hover:bg-gray-50">
+                  <tr key={ruta.id_ruta} className="hover:bg-gray-50">
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{ruta.nombre}</div>
+                      <div className="text-sm font-medium text-gray-900">{ruta.destino}</div>
                       <div className="sm:hidden text-xs text-gray-500 mt-1">
-                        {ruta.empresa} • {ruta.pasajerosDia} pax/día
+                        {ruta.empresa.nombre_empresa} • {formatDuracion(ruta.duracion_estimada)}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {formatTipoServicio(ruta.tipo_servicio)}
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                      {ruta.empresa}
+                      {ruta.empresa.nombre_empresa}
                     </td>
-                    
-                    
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {ruta.precio} {ruta.moneda.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs ${
+                        ruta.empresa.tipo_ruta === 'urbana' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-purple-100 text-purple-800'
+                      }`}>
+                        {formatTipoRuta(ruta.empresa.tipo_ruta)}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -202,13 +262,13 @@ const Admin = () => {
       <div className="mt-8 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-6 border border-gray-200">
         <h3 className="text-lg font-medium text-gray-800 mb-4">Acciones Rápidas</h3>
         <div className="flex flex-wrap gap-3">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center">
+          <button onClick={() => setShowRutaModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Nueva Ruta
           </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center">
+          <button onClick={() => setShowBusModal(true)} className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
@@ -222,10 +282,35 @@ const Admin = () => {
           </button>
         </div>
       </div>
+      {/* Modales compartidos para crear/editar rutas y buses */}
+      <ModalRutas
+        open={showRutaModal}
+        onClose={() => setShowRutaModal(false)}
+        initialData={null}
+        onDone={(info) => {
+          if (info?.type === 'success') {
+            refetchRutas && refetchRutas();
+            refetchBuses && refetchBuses();
+          }
+          setAlert(info);
+          setTimeout(() => setAlert(null), 3000);
+        }}
+      />
+
+      <ModalBuses
+        open={showBusModal}
+        onClose={() => setShowBusModal(false)}
+        initialData={null}
+        onDone={(info) => {
+          if (info?.type === 'success') {
+            refetchBuses && refetchBuses();
+          }
+          setAlert(info);
+          setTimeout(() => setAlert(null), 3000);
+        }}
+      />
     </div>
   );
 };
 
 export default Admin;
-
-

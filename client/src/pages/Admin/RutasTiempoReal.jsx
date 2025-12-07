@@ -6,7 +6,7 @@ import ConfirmDialog from '../../components/ConfirmDialog';
 import { useRutasTR, useCreateRutaTR, useUpdateRutaTR, useDeleteRutaTR } from '../../services/Rutas_RT/hooks';
 
 const RutasTiempoReal = () => {
-  console.log('Admin Rutas Tiempo Real page rendered');
+  //console.log('Admin Rutas Tiempo Real page rendered');
   
   // Use Rutas TR hooks to fetch and mutate registros en tiempo real
   const { data: registrosData = [], isLoading: isLoadingRegistros, isError: isErrorRegistros, error: errorRegistros, refetch: refetchRegistros } = useRutasTR();
@@ -32,6 +32,7 @@ const RutasTiempoReal = () => {
 
   const handleEliminar = (id_registro) => {
     // Open confirmation dialog before deleting
+    setApiError(null);
     setToDeleteId(id_registro);
     setConfirmOpen(true);
   };
@@ -176,15 +177,7 @@ const RutasTiempoReal = () => {
             <p className="mt-2 text-gray-600">Monitoreo y administración de rutas activas — Actualización en vivo</p>
           </div>
           <div className="flex items-center space-x-3">
-            <button
-              onClick={handleActualizar}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center shadow-md"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Actualizar
-            </button>
+           
             <button
               onClick={handleNuevoRegistro}
               className="bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center shadow-md"
@@ -400,16 +393,7 @@ const RutasTiempoReal = () => {
                                 </svg>
                               </button>
                             </div>
-                            <button
-                              className="text-cyan-600 hover:text-cyan-800 text-xs font-medium flex items-center"
-                              title="Ver detalles en tiempo real"
-                            >
-                              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                              </svg>
-                              Ver en vivo
-                            </button>
+                             
                           </div>
                         </td>
                       </tr>
@@ -495,6 +479,32 @@ const RutasTiempoReal = () => {
           setEditingRegistro(null);
         }}
       />
+
+      {/* Confirm dialog for delete */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Eliminar registro"
+        description={`¿Estás seguro que deseas eliminar el registro ${toDeleteId || ''}? Esta acción no se puede deshacer.`}
+        onCancel={() => { setConfirmOpen(false); setToDeleteId(null); setApiError(null); }}
+        onConfirm={confirmDelete}
+        confirmLabel={deleteRutaTR.isLoading ? 'Eliminando...' : 'Eliminar'}
+        cancelLabel="Cancelar"
+      />
+
+      {/* API error from mutations */}
+      {apiError && (
+        <div className="p-4 max-w-3xl mx-auto">
+          <ErrorBox
+            title="Error en la operación"
+            message="Ocurrió un error al procesar la petición."
+            details={apiError}
+            onRetry={() => {
+              setApiError(null);
+              refetchRegistros();
+            }}
+          />
+        </div>
+      )}
 
     </div>
   );

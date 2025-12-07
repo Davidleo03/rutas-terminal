@@ -58,17 +58,13 @@ export default function AdminLayout({ children }) {
               <span>Buses</span>
             </NavLink>
 
-            <NavLink to="/admin/choferes" className={linkClass}>
-              <span>Choferes</span>
-            </NavLink>
+            
 
             <NavLink to="/admin/rutas-tiempo-real" className={linkClass}>
               <span>Rutas Tiempo Real</span>
             </NavLink>
 
-            <NavLink to="/admin/asignacion-choferes" className={linkClass}>
-              <span>Asignación Choferes</span>
-            </NavLink>
+            
 
             <NavLink to="/admin/reportes-viajes" className={linkClass}>
               <span>Reportes</span>
@@ -114,17 +110,13 @@ export default function AdminLayout({ children }) {
                 <span>Buses</span>
               </NavLink>
 
-              <NavLink to="/admin/choferes" className={linkClass} onClick={() => setOpen(false)}>
-                <span>Choferes</span>
-              </NavLink>
+            
 
               <NavLink to="/admin/rutas-tiempo-real" className={linkClass} onClick={() => setOpen(false)}>
                 <span>Rutas Tiempo Real</span>
               </NavLink>
 
-              <NavLink to="/admin/asignacion-choferes" className={linkClass} onClick={() => setOpen(false)}>
-                <span>Asignación Choferes</span>
-              </NavLink>
+              
 
               <NavLink to="/admin/reportes-viajes" className={linkClass} onClick={() => setOpen(false)}>
                 <span>Reportes</span>

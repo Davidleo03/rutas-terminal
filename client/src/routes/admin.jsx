@@ -5,9 +5,8 @@ import Rutas from '../pages/Admin/Rutas'
 import Empresas from '../pages/Admin/Empresas'
 import Usuarios from '../pages/Admin/Usuarios'
 import Buses from '../pages/Admin/Buses'
-import Choferes from '../pages/Admin/Choferes'
+
 import RutasTiempoReal from '../pages/Admin/RutasTiempoReal'
-import AsignacionChoferes from '../pages/Admin/AsignacionChoferes'
 import ReportesViajes from '../pages/Admin/ReportesViajes'
 
 const adminRoutes = [
@@ -40,17 +39,10 @@ const adminRoutes = [
         element: <Buses />,
       },
       {
-        path: 'choferes',
-        element: <Choferes />,
-      },
-      {
         path: 'rutas-tiempo-real',
         element: <RutasTiempoReal />,
       },
-      {
-        path: 'asignacion-choferes',
-        element: <AsignacionChoferes />,
-      },
+      
       {
         path: 'reportes-viajes',
         element: <ReportesViajes />,

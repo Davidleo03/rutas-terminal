@@ -16,7 +16,7 @@ const RoutesTable = ({ rutas, getColorAnden, getColorServicio, getColorProgreso,
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {rutas.map((ruta) => (
-            <tr key={ruta.id} className="hover:bg-gray-50 transition-colors border-l-4 border-orange-500">
+            <tr key={ruta.id_ruta} className="hover:bg-gray-50 transition-colors border-l-4 border-orange-500">
               <td className="px-6 py-4">
                 <div className="flex items-center space-x-3">
                   <div>
@@ -60,7 +60,7 @@ const RoutesTable = ({ rutas, getColorAnden, getColorServicio, getColorProgreso,
               </td>
               <td className="px-6 py-4">
                 <div className="text-right">
-                  <div className="text-lg font-bold text-green-600">{formatPrecio(ruta.precio)}</div>
+                  <div className="text-lg font-bold text-green-600">{ formatPrecio(ruta.precio)}</div>
                 </div>
               </td>
             </tr>

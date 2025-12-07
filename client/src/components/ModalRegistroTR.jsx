@@ -16,6 +16,7 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
     id_ruta: '',
     id_bus: '',
     asientos_disponibles: '',
+    hora_salida: '',
   };
 
   const [form, setForm] = useState({ ...defaultForm });
@@ -33,6 +34,8 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
           id_ruta: initialData.id_ruta != null ? String(initialData.id_ruta) : '',
           id_bus: initialData.id_bus != null ? String(initialData.id_bus) : '',
           asientos_disponibles: initialData.asientos_disponibles != null ? String(initialData.asientos_disponibles) : '',
+          // store as HH:MM for the time input (trim seconds if present)
+          hora_salida: initialData.hora_salida != null ? String(initialData.hora_salida).substring(0,5) : '',
         });
       } else {
         setForm({ ...defaultForm });
@@ -52,6 +55,8 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
     if (!form.id_bus || isNaN(Number(form.id_bus)) || Number(form.id_bus) <= 0) e.id_bus = 'ID de bus válido requerido';
     if (form.asientos_disponibles === '') e.asientos_disponibles = 'Asientos disponibles requerido';
     else if (isNaN(Number(form.asientos_disponibles)) || Number(form.asientos_disponibles) < 0) e.asientos_disponibles = 'Número válido (>= 0)';
+    if (!form.hora_salida) e.hora_salida = 'Hora de salida requerida';
+    else if (!/^\d{2}:\d{2}$/.test(form.hora_salida)) e.hora_salida = 'Formato de hora inválido (HH:MM)';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -68,6 +73,8 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
       id_ruta: Number(form.id_ruta),
       id_bus: Number(form.id_bus),
       asientos_disponibles: Number(form.asientos_disponibles),
+      // normalize to HH:MM:SS expected by backend; append :00 when only HH:MM
+      hora_salida: form.hora_salida ? (/^\d{2}:\d{2}$/.test(form.hora_salida) ? `${form.hora_salida}:00` : String(form.hora_salida)) : null,
     };
 
     if (onSubmit) {
@@ -160,6 +167,18 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
               ))}
             </select>
             {errors.id_bus && <div className="text-red-600 text-xs mt-1">{errors.id_bus}</div>}
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Hora de salida</label>
+            <input
+              type="time"
+              name="hora_salida"
+              value={form.hora_salida}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-200 ${errors.hora_salida ? 'border-red-400' : 'border-gray-200'}`}
+            />
+            {errors.hora_salida && <div className="text-red-600 text-xs mt-1">{errors.hora_salida}</div>}
           </div>
 
           <div>

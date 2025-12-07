@@ -37,6 +37,21 @@ class AuthController {
             res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
+
+    static async registerUser(req, res) {
+        const userData = req.body;
+
+        try {
+            const newUser = await UserModel.createUser(userData);
+            res.status(201).json({
+                message: 'Usuario registrado exitosamente',
+                user: newUser
+            });
+        } catch (error) {
+            console.error('Error en el servidor:', error.message);
+            res.status(500).json({ error: 'Error interno del servidor' });
+        }
+    }   
 }
 
 export default AuthController;
