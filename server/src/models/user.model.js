@@ -14,7 +14,7 @@ class UserModel {
   }
 
   static async createUser(user) {
-    const { email, password, id_empresa, role,  } = user;
+    const { email, password, id_empresa, role  } = user;
     try {
         // Ensure we have an admin client
         if (!supabaseAdmin) {
