@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import useExportPDF from '../../hooks/useExportPDF';
 const ReportesViajes = () => {
   console.log('Reportes Rutas page rendered');
 
@@ -12,6 +12,7 @@ const ReportesViajes = () => {
     estado: '',
     destino: ''
   });
+  const { download, downloading, error } = useExportPDF();
 
   // Tipos de reportes disponibles
   const tiposReporte = [
@@ -44,9 +45,13 @@ const ReportesViajes = () => {
     // Lógica para generar reporte
   };
 
-  const handleExportarPDF = () => {
-    console.log('Exportando a PDF con filtros:', filtros);
-    // Lógica para exportar a PDF
+  const handleExportarPDF = async () => {
+    try {
+      await download(filtros, { filenamePrefix: 'reporte_viajes' });
+    } catch (err) {
+      // Puedes reemplazar con tu sistema de toasts
+      alert('No se pudo generar el PDF. Revisa la consola para más detalles.');
+    }
   };
 
   const handleExportarExcel = () => {
@@ -233,12 +238,20 @@ const ReportesViajes = () => {
         <div className="flex items-center mt-10 space-x-3">
           <button
             onClick={handleExportarPDF}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center shadow-md"
+            disabled={downloading}
+            className={`bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center shadow-md ${downloading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-            Exportar PDF
+            {downloading ? (
+              <svg className="w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            )}
+            <span>{downloading ? 'Generando PDF...' : 'Exportar PDF'}</span>
           </button>
 
         </div>
@@ -398,12 +411,20 @@ const ReportesViajes = () => {
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
           <button
             onClick={handleExportarPDF}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-red-500 hover:text-red-50 flex items-center justify-center"
+            disabled={downloading}
+            className={`px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-red-500 hover:text-red-50 flex items-center justify-center ${downloading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-            Descargar PDF
+            {downloading ? (
+              <svg className="w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            )}
+            <span>{downloading ? 'Generando PDF...' : 'Exportar a PDF'}</span>
           </button>
           <button
             onClick={handleExportarExcel}

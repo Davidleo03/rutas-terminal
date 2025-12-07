@@ -1,4 +1,5 @@
 import RutasTRModel from "../models/rutas_TR.model.js";
+import ReportGenerator from "../utils/ReportGenerator.js";
 
 class RutasTRController {
     static async getAllRutasTR(req, res) {
@@ -47,6 +48,18 @@ class RutasTRController {
         try {
             const deletedRutaTR = await RutasTRModel.deleteRutaTR(id);
             res.status(200).json(deletedRutaTR);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async downloadTripsPDF(req, res) {
+        try {
+            const rutasTR = await RutasTRModel.getAllRutasTR();
+            const buffer = await ReportGenerator.generateTripsPDF(rutasTR, { title: 'Reporte - Rutas Tiempo Real' });
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'attachment; filename="reporte_rutas_tr.pdf"');
+            res.send(buffer);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
