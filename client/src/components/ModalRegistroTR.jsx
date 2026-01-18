@@ -19,6 +19,8 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
     hora_salida: '',
   };
 
+  const [empresa_id, setEmpresa_id] = useState(null);
+
   const [form, setForm] = useState({ ...defaultForm });
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
@@ -48,6 +50,33 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
   const { data: busesData = [], isLoading: isLoadingBuses } = useBuses();
   const rutas = Array.isArray(rutasData) ? rutasData : [];
   const buses = Array.isArray(busesData) ? busesData : [];
+
+  // Cuando cambie la ruta seleccionada en el form, actualizamos empresa_id
+  // tomando la empresa que pertenece a esa ruta. Además, si el bus actualmente
+  // seleccionado no pertenece a la empresa de la nueva ruta, lo limpiamos.
+  useEffect(() => {
+    const rutaId = form.id_ruta;
+    if (!rutaId) {
+      setEmpresa_id(null);
+      return;
+    }
+
+    const found = rutas.find(r => String(r.id_ruta) === String(rutaId));
+    const eid = found
+      ? (found.empresa_id ?? found.id_empresa ?? found.empresa?.id_empresa ?? found.empresa?.id)
+      : null;
+
+    setEmpresa_id(eid != null ? String(eid) : null);
+
+    // si hay un bus seleccionado y no pertenece a la empresa de la ruta, limpiarlo
+    if (form.id_bus) {
+      const busObj = buses.find(b => String(b.id_bus) === String(form.id_bus));
+      const busEmpresaId = busObj ? (busObj.empresa_id ?? busObj.empresa?.id_empresa ?? busObj.empresa?.id) : null;
+      if (busEmpresaId != null && String(busEmpresaId) !== String(eid)) {
+        setForm(prev => ({ ...prev, id_bus: '' }));
+      }
+    }
+  }, [form.id_ruta, rutas, buses]);
 
   const validate = () => {
     const e = {};
@@ -81,14 +110,49 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
       setIsSubmitting(true);
       try {
         const result = await onSubmit(payload, initialData);
-        const msg = initialData ? 'Registro actualizado' : 'Registro creado';
-        setAlert({ type: 'success', message: msg });
-        onDone && onDone({ type: 'success', message: msg, data: result });
-        setTimeout(() => {
+
+        // Determinar éxito basado en la respuesta de la API.
+        // Soportamos varias formas: { status: 200 }, { statusCode: 200 }, { ok: true }, o datos devueltos.
+        let success = false;
+        let resultMessage = null;
+        if (result == null) {
+          // Si no hay respuesta explícita, asumimos éxito
+          success = true;
+        } else if (typeof result === 'object') {
+          if (Object.prototype.hasOwnProperty.call(result, 'status')) {
+            success = Number(result.status) === 200;
+          } else if (Object.prototype.hasOwnProperty.call(result, 'statusCode')) {
+            success = Number(result.statusCode) === 200;
+          } else if (Object.prototype.hasOwnProperty.call(result, 'ok')) {
+            success = !!result.ok;
+          } else {
+            // Si es un objeto sin status conocido, asumimos que es la carga útil -> éxito
+            success = true;
+          }
+
+          // Mensaje preferido desde la respuesta
+          resultMessage = result.message || result.msg || result.error || null;
+        } else {
+          // respuesta no-objeto (string, number, etc) -> tratamos como éxito
+          success = true;
+          resultMessage = String(result);
+        }
+
+        if (success) {
+          const msg = initialData ? 'Registro actualizado' : 'Registro creado';
+          setAlert({ type: 'success', message: resultMessage || msg });
+          onDone && onDone({ type: 'success', message: resultMessage || msg, data: result });
+          setTimeout(() => {
+            setIsSubmitting(false);
+            setAlert(null);
+            onClose && onClose();
+          }, 800);
+        } else {
+          const m = resultMessage || 'Ha ocurrido un error al procesar la solicitud';
+          setAlert({ type: 'error', message: m });
+          onDone && onDone({ type: 'error', message: m });
           setIsSubmitting(false);
-          setAlert(null);
-          onClose && onClose();
-        }, 800);
+        }
       } catch (err) {
         const m = (err && (err.message || String(err))) || 'Error al procesar';
         setAlert({ type: 'error', message: m });
@@ -146,6 +210,7 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
               <option value="">Seleccione una ruta</option>
               {isLoadingRutas && <option value="">Cargando rutas...</option>}
               {rutas.map((r) => (
+                
                 <option key={r.id_ruta} value={String(r.id_ruta)}>{`${r.destino || r.nombre || 'Ruta ' + r.id_ruta} (ID ${r.id_ruta})`}</option>
               ))}
             </select>
@@ -162,9 +227,18 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
             >
               <option value="">Seleccione un bus</option>
               {isLoadingBuses && <option value="">Cargando buses...</option>}
-              {buses.map((b) => (
-                <option key={b.id_bus} value={String(b.id_bus)}>{`${b.placa || 'Bus ' + b.id_bus} ${b.numero ? '• #' + b.numero : ''}`}</option>
-              ))}
+                {/* Mostrar sólo los buses cuya empresa coincida con la empresa de la ruta seleccionada */}
+                {buses
+                  .filter(b => {
+                    const busEmpresaId = b.empresa_id ?? b.empresa?.id_empresa ?? b.empresa?.id;
+                    if (!empresa_id) return true; // si no hay empresa determinada, mostrar todos
+                    // mantener el bus actual si estamos editando aunque no coincida
+                    if (initialData && String(initialData.id_bus) === String(b.id_bus)) return true;
+                    return String(busEmpresaId) === String(empresa_id);
+                  })
+                  .map((b) => (
+                    <option key={b.id_bus} value={String(b.id_bus)}>{`${b.placa || 'Bus ' + b.id_bus} ${b.numero ? '• #' + b.numero : ''}`}</option>
+                  ))}
             </select>
             {errors.id_bus && <div className="text-red-600 text-xs mt-1">{errors.id_bus}</div>}
           </div>

@@ -20,11 +20,20 @@ class RutasTRModel {
     }
 
     static async createRutaTR(rutaTR) {
+        const { asientos_disponibles, ...dataRuta } = rutaTR
         const { data, error } = await supabase
             .from('rutas_tiempo_real')
             .insert([rutaTR])
+            .select('*, ruta:rutas(*)')
             .single();
+        
         if (error) throw error;
+        const { error: errorHistory } = await supabase
+            .from('historial_rutas')
+            .insert([{...dataRuta, id_empresa: data?.ruta?.id_empresa}])
+            .single();
+        if (errorHistory) throw errorHistory;
+
         return data;
     }
 

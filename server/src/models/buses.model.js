@@ -14,6 +14,7 @@ class BusesModel {
     }
 
 
+
     static async createBus(busData) {
         const { data, error } = await supabase
             .from('buses')

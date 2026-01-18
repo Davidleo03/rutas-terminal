@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ModalRegistroTR from '../../components/ModalRegistroTR';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import ErrorBox from '../../components/ErrorBox';
@@ -18,6 +18,13 @@ const RutasTiempoReal = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [toDeleteId, setToDeleteId] = useState(null);
   const [apiError, setApiError] = useState(null);
+  const [notification, setNotification] = useState(null);
+  // auto-dismiss notification after a few seconds
+  useEffect(() => {
+    if (!notification) return;
+    const t = setTimeout(() => setNotification(null), 4000);
+    return () => clearTimeout(t);
+  }, [notification]);
   // Mirror server data into a local state for immediate UI responsiveness, fallback to server data
   const registros = registrosData && registrosData.length ? registrosData : registrosLocal;
   const [openModal, setOpenModal] = useState(false);
@@ -44,9 +51,12 @@ const RutasTiempoReal = () => {
       await deleteRutaTR.mutateAsync({ id: toDeleteId });
       setConfirmOpen(false);
       setToDeleteId(null);
+      // show success notification after delete
+      setNotification({ type: 'success', message: 'Registro eliminado correctamente' });
     } catch (err) {
       console.error('Error borrando registro', err);
       setApiError(err);
+      setNotification({ type: 'error', message: 'Error al eliminar el registro' });
     }
   };
 
@@ -189,6 +199,12 @@ const RutasTiempoReal = () => {
             </button>
           </div>
         </div>
+        {/* Notification banner (success / error) */}
+        {notification && (
+          <div className={`mt-3 p-3 rounded text-sm ${notification.type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'}`}>
+            {notification.message}
+          </div>
+        )}
       </div>
 
       {/* Tabla Responsiva */}
@@ -475,6 +491,16 @@ const RutasTiempoReal = () => {
         onSubmit={handleRegistroSubmit}
         onDone={(res) => {
           console.log('ModalRegistroTR done', res);
+          // res expected: { type: 'success'|'error', message?, data? }
+          if (res && res.type === 'success') {
+            setNotification({ type: 'success', message: res.message || 'Operación realizada con éxito' });
+          } else if (res && res.type === 'error') {
+            setNotification({ type: 'error', message: res.message || 'Ocurrió un error en la operación' });
+          } else {
+            // fallback: assume success
+            setNotification({ type: 'success', message: 'Operación completada' });
+          }
+
           setOpenModal(false);
           setEditingRegistro(null);
         }}

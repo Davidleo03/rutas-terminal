@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchBuses, deleteBus, createBus, updateBus } from '../buses/api.js';
+import { fetchBuses, deleteBus, createBus, updateBus, fetchBusesByEmpresa } from '../buses/api.js';
 
 export const useBuses = (options = {}) => {
   return useQuery({
@@ -31,6 +31,13 @@ export const useUpdateBus = () => {
   return useMutation({
     mutationFn: (data) => updateBus(data.busId, data.busData),
     onSuccess: () => qc.invalidateQueries(['buses']),
+  });
+};
+
+export const useBusesByEmpresa = (empresaId) => {
+  return useQuery({
+    queryKey: ['buses-empresa', empresaId],
+    queryFn: () => fetchBusesByEmpresa(empresaId),
   });
 };
 

@@ -15,7 +15,20 @@ const Table = () => {
   
 
   // Filtrar rutas según el tipo seleccionado
-  const datosActuales = routesData?.filter(ruta => ruta.empresa.tipo_ruta === tipoRuta);
+  const datosActuales = routesData?.filter(ruta => ruta.empresa.tipo_ruta === tipoRuta) || [];
+
+  // Eliminar duplicados por la combinación (destino, tipo_servicio)
+  // Mantener la primera aparición de cada par. Ej: {Maracay, directo} y {Maracay, parada_corta}
+  // son diferentes y se muestran ambos; pero si hay dos {Maracay, directo} solo se muestra uno.
+  const seen = new Set();
+  const uniqueDatos = datosActuales.filter(ruta => {
+    const destino = String(ruta?.destino ?? '').trim().toLowerCase();
+    const tipo = String(ruta?.tipo_servicio ?? '').trim().toLowerCase();
+    const key = `${destino}::${tipo}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 
   // Función para formatear la duración
   const formatDuracion = (duracion) => {
@@ -158,7 +171,7 @@ const Table = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {datosActuales.map((ruta, i) => (
+              {uniqueDatos.map((ruta, i) => (
                 <tr key={i} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {ruta.empresa.nombre_empresa}
@@ -202,7 +215,7 @@ const Table = () => {
         {/* Vista para móviles */}
         <div className="md:hidden">
           <div className="divide-y divide-gray-200">
-            {datosActuales.map((ruta, i) => (
+            {uniqueDatos.map((ruta, i) => (
               <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex justify-between items-start mb-2">
                   <div>
@@ -271,8 +284,8 @@ const Table = () => {
               : '* Reservas recomendadas para rutas extraurbanas'
             }
           </p>
-          <p className="text-xs text-gray-500 text-center mt-1">
-            Mostrando {datosActuales.length} de {routesData.length} rutas totales
+            <p className="text-xs text-gray-500 text-center mt-1">
+            Mostrando {uniqueDatos.length} de {routesData.length} rutas totales
           </p>
         </div>
       </div>

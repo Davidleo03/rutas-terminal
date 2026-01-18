@@ -4,7 +4,8 @@ class RutasModel {
     static async getRutas() {
         const { data, error } = await supabase
             .from('rutas')
-            .select('*, empresa:id_empresa(nombre_empresa, tipo_ruta)');
+            .select('*, empresa:id_empresa(nombre_empresa, tipo_ruta)')
+            .order('destino', { ascending: true });
 
         if (error) {
             throw new Error('Error al obtener las rutas: ' + error.message);
@@ -49,6 +50,18 @@ class RutasModel {
         if (error) {
             throw new Error('Error al eliminar la ruta: ' + error.message);
         }
+    }
+
+    static async getRutasByEmpresa(empresaId) {
+        const { data, error } = await supabase
+            .from('rutas')
+            .select('*, empresa:id_empresa(nombre_empresa, tipo_ruta)')
+            .eq('id_empresa', empresaId);
+            
+        if (error) {
+            throw new Error('Error al obtener las rutas por empresa: ' + error.message);
+        }
+        return data;
     }
 }
 

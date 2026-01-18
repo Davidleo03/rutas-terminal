@@ -25,6 +25,7 @@ class UserModel {
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
           email,
           password,
+          email_confirm: true // Marca el email como confirmado
         });
 
         if (authError) {

@@ -8,5 +8,6 @@ router.get('/', RutasController.getRutas);
 router.post('/', RutasController.createRuta);
 router.put('/:id', RutasController.updateRuta);
 router.delete('/:id', RutasController.deleteRuta);
+router.get('/empresa/:id', RutasController.getRutasByEmpresa);
 
 export default router;

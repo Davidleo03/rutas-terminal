@@ -24,7 +24,7 @@ export default function useLogin(options = {}) {
       if (typeof userOnSuccess === 'function') userOnSuccess(data);
 
       // redirección por rol
-      if (data.user?.role === 'admin-linea') navigate('/admin-empresa');
+      if (data.user?.role === 'admin-linea') navigate('/admin-linea');
       else if (data.user?.role === 'admin') navigate('/admin');
       setIsLoading(false);
     },

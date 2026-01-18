@@ -2,8 +2,9 @@ import { useBuses, useDeleteBus } from '../../services/buses/hooks';
 import ModalBuses from '../../components/ModalBuses';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import ErrorBox from '../../components/ErrorBox';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Buses = () => {
 
@@ -13,6 +14,8 @@ const Buses = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedBus, setSelectedBus] = useState(null);
   const [alert, setAlert] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [toDeleteId, setToDeleteId] = useState(null);
 
   
 
@@ -26,8 +29,18 @@ const Buses = () => {
 
   const handleEliminar = (id) => {
     if (!id) return;
-    if (!confirm('¿Eliminar este bus?')) return;
-    deleteMutation.mutate(id);
+    setToDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!toDeleteId) {
+      setConfirmOpen(false);
+      return;
+    }
+    deleteMutation.mutate(toDeleteId);
+    setConfirmOpen(false);
+    setToDeleteId(null);
   };
 
   const handleRegistrar = () => {
@@ -53,6 +66,18 @@ const Buses = () => {
 
   return (
     <div className="relative min-h-screen">
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Eliminar bus"
+        description={(() => {
+          const b = buses.find((x) => x.id_bus === toDeleteId);
+          return b ? `¿Eliminar el bus ${b.placa}?` : '¿Eliminar este bus?';
+        })()}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+      />
       {alert && (
         <div className={`fixed top-4 right-4 z-40 px-4 py-2 rounded ${alert.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
           {alert.message}

@@ -1,6 +1,7 @@
 import React from 'react';
 
 const RoutesTable = ({ rutas, getColorAnden, getColorServicio, getColorProgreso, formatPrecio }) => {
+
   return (
     <div className="hidden lg:block overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -10,7 +11,7 @@ const RoutesTable = ({ rutas, getColorAnden, getColorServicio, getColorProgreso,
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servicio / Empresa</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado de Carga</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salida / Duración</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servicios / Asientos</th>
+        
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
           </tr>
         </thead>
@@ -44,18 +45,10 @@ const RoutesTable = ({ rutas, getColorAnden, getColorServicio, getColorProgreso,
                   <div className="text-gray-500">{ruta.duracion}</div>
                 </div>
               </td>
-              <td className="px-6 py-4">
-                <div className="text-sm">
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {ruta.serviciosAdicionales.map((servicio, index) => (
-                      <span key={index} className="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-50 text-blue-700">{servicio}</span>
-                    ))}
-                  </div>
-                </div>
-              </td>
+              
               <td className="px-6 py-4">
                 <div className="text-right">
-                  <div className="text-lg font-bold text-green-600">{ formatPrecio(ruta.precio)}</div>
+                  <div className="text-lg font-bold text-green-600">{ formatPrecio(ruta.precio, ruta.moneda)}</div>
                 </div>
               </td>
             </tr>

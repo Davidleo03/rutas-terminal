@@ -6,6 +6,7 @@ import BusesRoutes from "./buses.routes.js";
 import RutasRoutes from "./rutas.routes.js";
 import RutasTRRoutes from "./rutas_RT.routes.js";
 import userRoutes from "./user.routes.js";
+import ReportesRoutes from "./reportes.routes.js";
 
 const router = Router();
 
@@ -21,6 +22,8 @@ router.use("/rutas", RutasRoutes);
 router.use("/rutas_tiempo_real", RutasTRRoutes);
 
 router.use("/users", userRoutes);
+
+router.use('/reportes', ReportesRoutes);
 
 
 

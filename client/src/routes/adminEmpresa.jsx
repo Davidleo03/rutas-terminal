@@ -1,17 +1,30 @@
 import RequireAuth from '../components/RequireAuth'
-import AdminEmpresa from '../pages/Admin/AdminEmpresa'
+import DashboardAdmin from '../pages/Admin-empresa/Dashboard'
 import AdminLayout from '../components/AdminLayout'
 
 const adminEmpresaRoutes = [
   {
-    path: "/admin-empresa",
+    path: "/admin-linea",
     element: (
       <RequireAuth allowedRoles={[ 'admin-linea' ]}>
-        <AdminLayout>
-          <AdminEmpresa />
-        </AdminLayout>
+        <AdminLayout/>
+        
       </RequireAuth>
     ),
+    children: [
+      {
+        index: true,
+        element: <DashboardAdmin/>,
+      },
+      {
+        path: "rutas",
+        element : <><h2>Rutas</h2></>
+      },
+      {
+        path: "buses",
+        element : <><h2>Buses</h2></>
+      }
+    ],
   },
 ]
 

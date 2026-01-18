@@ -41,6 +41,16 @@ class RutasController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    static async getRutasByEmpresa(req, res) {
+        try {
+            const empresaId = req.params.id;
+            const rutas = await RutasModel.getRutasByEmpresa(empresaId);
+            res.status(200).json(rutas);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 export default RutasController;

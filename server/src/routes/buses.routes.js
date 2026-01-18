@@ -13,7 +13,7 @@ router.put("/:busId", BusesController.updateBus);
 
 router.delete("/:busId", BusesController.deleteBus);
 
-router.get("/:empresaId", BusesController.getBusByEmpresa);
+router.get("/empresa/:empresaId", BusesController.getBusByEmpresa);
 
 export default router;
 

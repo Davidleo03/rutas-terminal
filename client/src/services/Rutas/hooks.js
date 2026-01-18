@@ -1,10 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchRutas, createRuta, updateRuta, deleteRuta } from './api';
+import { fetchRutas, createRuta, updateRuta, deleteRuta, fetchRutasByEmpresa } from './api';
 
 const RUTAS_KEY = ['rutas'];
 
 export function useRutas(options = {}) {
 	return useQuery({ queryKey: RUTAS_KEY, queryFn: fetchRutas, ...options });
+}
+
+export function useRutasByEmpresa(empresaId, options = {}) {
+	return useQuery({
+		queryKey: [...RUTAS_KEY, 'rutas-empresa', empresaId],
+		queryFn: () => fetchRutasByEmpresa(empresaId),
+		...options,
+	});
 }
 
 export function useCreateRuta() {

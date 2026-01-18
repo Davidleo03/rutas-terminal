@@ -74,5 +74,22 @@ export const deleteBus = async (busId) => {
   return res.json();
 };
 
+
+export const fetchBusesByEmpresa = async (empresaId) => {
+  const res = await fetch(`${base}/buses/empresa/${empresaId}`);
+  if (!res.ok) {
+    try {
+      const err = await res.json();
+      const error = new Error(err?.message || JSON.stringify(err) || 'Error fetching buses by empresa');
+      if (err && err.errors) error.errors = err.errors;
+      throw error;
+    } catch (e) {
+      const text = await res.text();
+      throw new Error(text || 'Error fetching buses by empresa');
+    }
+  }
+  return res.json();
+};
+
 export default null;
 

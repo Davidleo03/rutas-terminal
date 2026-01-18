@@ -10,6 +10,14 @@ export const fetchRutas = async () => {
   return response.json();
 }
 
+export const fetchRutasByEmpresa = async (empresaId) => {
+  const response = await fetch(`${RUTAS_API}/empresa/${empresaId}`);
+  if (!response.ok) {
+    throw new Error('Error fetching rutas by empresa');
+  }
+  return response.json();
+}
+
 export const createRuta = async (rutaData) => {
   const response = await fetch(RUTAS_API, {
     method: 'POST',
