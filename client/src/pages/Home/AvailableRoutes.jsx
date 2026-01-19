@@ -56,7 +56,7 @@ const AvailableRoutes = () => {
   });
 
   const rutasParaMostrar = rutasTR?.map(mapRutaTRToFlat)
-  console.log('Rutas TR mapeadas:', rutasParaMostrar);
+  //console.log('Rutas TR mapeadas:', rutasParaMostrar);
     
 
   return (
