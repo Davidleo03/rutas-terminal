@@ -50,14 +50,14 @@ const AvailableRoutes = () => {
     progresoCarga: function() {
       const capacidadTotal = tr?.bus?.capacidad ?? tr?.bus?.capacidad ?? 1;
       const asientosOcupados = capacidadTotal - (tr.asientosDisponibles || 0);
-      console.log('Ocupacion', ((asientosOcupados / capacidadTotal) * 100));  
+      //console.log('Ocupacion', ((asientosOcupados / capacidadTotal) * 100));  
       return Math.round((asientosOcupados / capacidadTotal) * 100);
     }(),
   });
 
-  const rutasParaMostrar = (Array.isArray(rutasTR) && rutasTR.length > 0)
-    ? rutasTR.map(mapRutaTRToFlat)
-    : rutasFiltradas;
+  const rutasParaMostrar = rutasTR?.map(mapRutaTRToFlat)
+  console.log('Rutas TR mapeadas:', rutasParaMostrar);
+    
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
