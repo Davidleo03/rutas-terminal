@@ -65,6 +65,8 @@ const ModalBuses = ({ open, onClose, initialData = null, onDone }) => {
       capacidad: Number(form.capacidad) || 0,
       color: form.color,
       numero: form.numero,
+      chofer: form.chofer || null,
+      ci_chofer: form.ci_chofer || null,
       aire_acondicionado: !!form.aire_acondicionado,
       activo: !!form.activo,
     };
@@ -147,6 +149,19 @@ const ModalBuses = ({ open, onClose, initialData = null, onDone }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Número</label>
                 <input name="numero" value={form.numero} onChange={handleChange} placeholder="Ej: 001" className={`w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 ${errors.numero ? 'border-red-500' : 'border-gray-200'}`} />
                 {errors.numero && <div className="text-red-600 text-sm mt-1">{errors.numero}</div>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Chofer</label>
+                <input name="chofer" value={form.chofer} onChange={handleChange} placeholder="Nombre del chofer" className={`w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 ${errors.chofer ? 'border-red-500' : 'border-gray-200'}`} />
+                {errors.chofer && <div className="text-red-600 text-sm mt-1">{errors.chofer}</div>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Cédula (CI)</label>
+                <input name="ci_chofer" value={form.ci_chofer} onChange={handleChange} placeholder="Ej: V12345678" className={`w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 ${errors.ci_chofer ? 'border-red-500' : 'border-gray-200'}`} />
+                {errors.ci_chofer && <div className="text-red-600 text-sm mt-1">{errors.ci_chofer}</div>}
               </div>
             </div>
 

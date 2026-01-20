@@ -10,6 +10,8 @@ export function useModalBusesForm(initialData, open) {
     numero: '',
     aire_acondicionado: false,
     activo: false,
+    chofer: '',
+    ci_chofer: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -25,9 +27,11 @@ export function useModalBusesForm(initialData, open) {
         numero: initialData.numero || '',
         aire_acondicionado: !!initialData.aire_acondicionado,
         activo: !!initialData.activo,
+        chofer: initialData.chofer || '',
+        ci_chofer: initialData.ci_chofer || initialData.cedula || '',
       });
     } else if (open) {
-      setForm({ placa: '', modelo: '', empresa: '', capacidad: '', color: '', numero: '', aire_acondicionado: false, activo: false });
+      setForm({ placa: '', modelo: '', empresa: '', capacidad: '', color: '', numero: '', aire_acondicionado: false, activo: false, chofer: '', ci_chofer: '' });
       setErrors({});
     }
   }, [initialData, open]);
@@ -49,7 +53,7 @@ export function useModalBusesForm(initialData, open) {
   };
 
   const resetForm = () => {
-    setForm({ placa: '', modelo: '', empresa: '', capacidad: '', color: '', numero: '', aire_acondicionado: false, activo: false });
+    setForm({ placa: '', modelo: '', empresa: '', capacidad: '', color: '', numero: '', aire_acondicionado: false, activo: false, chofer: '', ci_chofer: '' });
     setErrors({});
   };
 

@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 const Buses = () => {
 
   const { data: busesData, isLoading, isError, error, refetch } = useBuses();
+  
   const deleteMutation = useDeleteBus();
 
   const [showModal, setShowModal] = useState(false);
@@ -137,7 +138,13 @@ const Buses = () => {
                     Modelo
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                    Chofer
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                     Empresa
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                    Cédula
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                     Capacidad
@@ -169,6 +176,8 @@ const Buses = () => {
                         <div className="sm:hidden text-xs text-gray-500 mt-1">
                         <div><span className="font-semibold">Modelo:</span> {bus.modelo}</div>
                         <div><span className="font-semibold">Empresa:</span> {bus.empresa}</div>
+                        <div><span className="font-semibold">Chofer:</span> {bus.chofer || '-'}</div>
+                        <div><span className="font-semibold">Cédula:</span> {bus.ci_chofer || bus.cedula || '-'}</div>
                         <div><span className="font-semibold">Capacidad:</span> {bus.capacidad} asientos</div>
                         <div><span className="font-semibold">Aire Acond.:</span>
                           <span className={`ml-1 ${bus.aire_acondicionado ? 'text-green-600' : 'text-red-600'}`}>
@@ -186,7 +195,13 @@ const Buses = () => {
                       {bus.modelo}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                      {bus.chofer || '-'}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                       {bus.empresa}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                      {bus.ci_chofer || bus.cedula || '-'}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
