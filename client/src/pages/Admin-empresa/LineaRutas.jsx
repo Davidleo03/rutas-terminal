@@ -1,12 +1,17 @@
-import { useRutas, useCreateRuta, useUpdateRuta, useDeleteRuta } from "../../services/Rutas/hooks";
+import { useRutasByEmpresa, useCreateRuta, useUpdateRuta, useDeleteRuta } from "../../services/Rutas/hooks";
 import { useState, useEffect } from 'react';
-import ModalRutas from '../../components/ModalRutas';
+import ModalRutasByEmpresa from '../../components/ModalRutaByEmpresa';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import useAuthStore from "../../localStore/auth";
 
 const LineaRutas = () => {
+
+  const user = useAuthStore((s) => s.user);
+
+  
   
   // Obtener rutas desde la API usando react-query
-  const { data: rutas = [], isLoading, isError, error, refetch } = useRutas();
+  const { data: rutas = [], isLoading, isError, error, refetch } = useRutasByEmpresa(user?.id_empresa);
 
   const handleEditar = (id_ruta) => {
     const ruta = rutas.find(r => r.id_ruta === id_ruta);
@@ -108,11 +113,10 @@ const LineaRutas = () => {
       filter === 'activas' ? ruta.activa :
       filter === 'inactivas' ? !ruta.activa :
       filter === 'directo' ? ruta.tipo_servicio === 'directo' :
-      filter === 'express' ? ruta.tipo_servicio === 'express' : true;
+      filter === 'parada_corta' ? ruta.tipo_servicio === 'parada_corta' : true;
     
     const matchesSearch = searchTerm === '' || 
       ruta.destino.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ruta.empresa.nombre_empresa.toLowerCase().includes(searchTerm.toLowerCase()) ||
       String(ruta.id_ruta).includes(searchTerm);
     
     return matchesFilter && matchesSearch;
@@ -260,7 +264,7 @@ const LineaRutas = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Buscar rutas por destino, empresa o ID..."
+                placeholder="Buscar rutas por destino"
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -519,7 +523,7 @@ const LineaRutas = () => {
             </div>
           </div>
         ) : (
-          <div className="px-5 py-12 text-center">
+          <div className="px-5 py-super-admin@gmail.com12 text-center">
             <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -566,7 +570,7 @@ const LineaRutas = () => {
       </div>
 
       {/* Modales */}
-      <ModalRutas
+      <ModalRutasByEmpresa
         open={openModal}
         onClose={() => setOpenModal(false)}
         initialData={editing}

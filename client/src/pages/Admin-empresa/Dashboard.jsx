@@ -407,7 +407,7 @@ const Dashboard = () => {
             <span className="text-xs text-gray-500 mt-1">Agregar a flota</span>
           </button>
           
-          <button className="w-full h-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-4 px-4 rounded-xl transition-all duration-200 flex flex-col items-center justify-center shadow hover:shadow-lg border border-gray-200">
+          <Link to="reportes" className="w-full h-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-4 px-4 rounded-xl transition-all duration-200 flex flex-col items-center justify-center shadow hover:shadow-lg border border-gray-200">
             <div className="bg-cyan-100 p-3 rounded-full mb-3">
               <svg className="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -415,7 +415,7 @@ const Dashboard = () => {
             </div>
             <span className="font-semibold">Ver Reportes</span>
             <span className="text-xs text-gray-500 mt-1">Estadísticas</span>
-          </button>
+          </Link>
           
           
         </div>
