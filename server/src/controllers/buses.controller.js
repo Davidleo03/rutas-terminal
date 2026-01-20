@@ -1,4 +1,5 @@
 
+import { check } from "zod";
 import BusesModel from "../models/buses.model.js";
 
 
@@ -17,6 +18,8 @@ class BusesController {
                 numero: bus.numero,
                 aire_acondicionado: bus.aire_acondicionado,
                 activo: bus.activo,
+                chofer: bus.chofer,
+                ci_chofer: bus.ci_chofer,
             }));
 
             res.status(200).json(buses);
@@ -28,9 +31,11 @@ class BusesController {
     static async createBus(req, res) {
         const busData = req.body;
         try {
+            
             await BusesModel.createBus(busData);
             res.status(201).json({ message: 'Bus creado exitosamente' });
         } catch (error) {
+            console.error('Error creating bus:', error);
             return next ? next(error) : res.status(500).json({ error: 'Ha ocurrido un error' });
         }
     }

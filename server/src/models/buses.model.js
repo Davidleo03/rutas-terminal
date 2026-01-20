@@ -10,6 +10,8 @@ class BusesModel {
             throw new Error('Error al obtener los buses: ' + error.message);
         }
 
+        
+
         return data;
     }
 
