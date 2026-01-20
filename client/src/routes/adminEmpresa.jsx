@@ -1,6 +1,7 @@
 import RequireAuth from '../components/RequireAuth'
 import DashboardAdmin from '../pages/Admin-empresa/Dashboard'
 import AdminLayout from '../components/AdminLayout'
+import LineaRutas from '../pages/Admin-empresa/LineaRutas'
 
 const adminEmpresaRoutes = [
   {
@@ -18,7 +19,7 @@ const adminEmpresaRoutes = [
       },
       {
         path: "rutas",
-        element : <><h2>Rutas</h2></>
+        element : <LineaRutas/>
       },
       {
         path: "buses",
