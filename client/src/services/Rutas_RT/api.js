@@ -49,6 +49,25 @@ export async function obtenerTodasRutasTR() {
     }
 }
 
+
+export async function obtenerRutasTRPorEmpresa(id_empresa) {
+    try {
+        const url = `${BASE_URL}/empresa/${id_empresa}`;
+        const response = await fetch(url, {
+            method: 'GET',
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al obtener las rutas para la empresa (ID: ${id_empresa}): ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(`Error en obtenerRutasTRPorEmpresa (ID: ${id_empresa}):`, error);
+        throw error;
+    }
+}
+
 /**
  * ## 3. Consultar por ID (Read - One) 🔎
  */

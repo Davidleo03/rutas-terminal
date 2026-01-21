@@ -9,6 +9,28 @@ class RutasTRModel {
         return data;
     }
 
+    static async getRutasTRByEmpresa(id_empresa) {
+        // Primero obtener los ids de las rutas que pertenecen a la empresa
+        const { data: rutas, error: rutasError } = await supabase
+            .from('rutas')
+            .select('id_ruta, empresa:empresas(nombre_empresa)')
+            .eq('id_empresa', id_empresa);
+            //console.log(rutas)
+        if (rutasError) throw rutasError;
+
+        const rutaIds = (rutas || []).map(r => r.id_ruta);
+        if (rutaIds.length === 0) return [];
+
+        // Luego obtener las rutas en tiempo real cuya columna FK (id_ruta) esté en esos ids
+        const { data, error } = await supabase
+            .from('rutas_tiempo_real')
+            .select('*, ruta:rutas(*), bus:buses(*)')
+            .in('id_ruta', rutaIds);
+        if (error) throw error;
+
+        return data?.map(d => ({...d, nombre_empresa: rutas[0].nombre_empresa}));
+    }
+
     static async getRutaTRById(id) {
         const { data, error } = await supabase
             .from('rutas_tiempo_real')

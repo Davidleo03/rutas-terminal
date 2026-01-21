@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     obtenerTodasRutasTR,
+    obtenerRutasTRPorEmpresa,
     obtenerRutaTRPorId,
     crearRutaTR,
     actualizarRutaTR,
@@ -25,6 +26,16 @@ export function useRutasTR(options = {}) {
         ...options
     });
 }
+
+export function useRutasTRByEmpresa(id_empresa, options = {}) {
+    return useQuery({
+        queryKey: [...RUTAS_TR_KEY, 'empresa', id_empresa],
+        queryFn: () => obtenerRutasTRPorEmpresa(id_empresa),
+        enabled: !!id_empresa,
+        ...options
+    })  
+}   
+
 
 /**
  * ## 2. Hook para Consultar una Ruta por ID (Read - One) 🔎

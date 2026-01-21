@@ -11,6 +11,17 @@ class RutasTRController {
         }
     }
 
+    static async getRutasTRByEmpresa(req, res) {
+        const { id_empresa } = req.params;
+        try {
+            const rutasTR = await RutasTRModel.getRutasTRByEmpresa(id_empresa);
+            
+            res.status(200).json(rutasTR);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
     static async getRutaTRById(req, res) {
         const { id } = req.params;
         try {
