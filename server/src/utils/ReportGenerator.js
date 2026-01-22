@@ -57,20 +57,18 @@ export default class ReportGenerator {
           // DEFINIR POSICIONES EXACTAS PARA CADA COLUMNA
           const columnPositions = {
             id: 50,      // Columna ID empieza en 50px
-            ruta: 100,   // Columna RUTA empieza en 100px  
-            bus: 280,    // Columna BUS empieza en 280px
-            hora: 360,   // Columna HORA empieza en 360px
-            fecha: 430,  // Columna FECHA empieza en 430px
-            asientos: 520 // Columna ASIENTOS empieza en 520px
+            ruta: 100,   // Columna RUTA empieza en 100px
+            bus: 300,    // Columna BUS empieza en 300px
+            hora: 380,   // Columna HORA empieza en 380px
+            fecha: 460   // Columna FECHA empieza en 460px
           };
-          
+
           const columnWidths = {
             id: 40,      // Ancho 40px para ID
-            ruta: 170,   // Ancho 170px para RUTA
+            ruta: 200,   // Ancho 200px para RUTA
             bus: 70,     // Ancho 70px para BUS
-            hora: 60,    // Ancho 60px para HORA
-            fecha: 80,   // Ancho 80px para FECHA
-            asientos: 30 // Ancho 30px para ASIENTOS
+            hora: 70,    // Ancho 70px para HORA
+            fecha: 120   // Ancho 120px para FECHA
           };
           
           // ===== ENCABEZADO DE LA TABLA =====
@@ -116,11 +114,7 @@ export default class ReportGenerator {
             align: 'center'
           });
           
-          // ASIENTOS
-          doc.text('ASNT.', columnPositions.asientos, headerY + 10, {  // Abreviado para que quepa
-            width: columnWidths.asientos,
-            align: 'center'
-          });
+          // (sin columna de asientos)
           
           // Línea bajo encabezado
           doc.moveTo(50, headerY + 30)
@@ -214,10 +208,7 @@ export default class ReportGenerator {
               trip.ruta?.destino || '-',
               trip.bus?.placa || '-',
               trip.hora_salida || '-',
-              fecha,
-              typeof trip.asientos_disponibles !== 'undefined' 
-                ? trip.asientos_disponibles.toString() 
-                : '-'
+              fecha
             ];
 
             
@@ -266,25 +257,7 @@ export default class ReportGenerator {
             });
             doc.fillColor('#000000');
             
-            // ASIENTOS - Centro con color: usamos color base y luego lo sobreescribimos según disponibilidad
-            const asientos = datos[5];
-            doc.fillColor(columnColors.asientos);
-            if (trip.asientos_disponibles !== undefined && trip.asientos_disponibles !== null) {
-              if (trip.asientos_disponibles <= 0) {
-                doc.fillColor('#ff0000'); // Rojo
-              } else if (trip.asientos_disponibles <= 5) {
-                doc.fillColor('#ff9900'); // Naranja
-              } else {
-                doc.fillColor('#009900'); // Verde
-              }
-            }
-
-            doc.text(asientos, columnPositions.asientos, rowY, {
-              width: columnWidths.asientos,
-              align: 'center'
-            });
-
-            // Restaurar color negro
+            // Restaurar color negro (asegura que las siguientes filas usen negro)
             doc.fillColor('#000000');
             
             // Mover a siguiente fila
@@ -309,19 +282,7 @@ export default class ReportGenerator {
             .fillColor('#000000')
             .text(`Total de viajes: ${trips.length}`, 50, doc.y);
           
-          const disponibles = trips.filter(t => 
-            typeof t.asientos_disponibles === 'number' && t.asientos_disponibles > 0
-          ).length;
-          
-          const completos = trips.filter(t => 
-            typeof t.asientos_disponibles === 'number' && t.asientos_disponibles <= 0
-          ).length;
-          
-          doc.fontSize(10)
-            .font('Helvetica')
-            .fillColor('#444444')
-            .text(`• Disponibles: ${disponibles} | • Completos: ${completos}`, 
-                  200, doc.y);
+          // (Se mantiene sólo el total de viajes; las estadísticas sobre asientos fueron eliminadas)
         }
         
         // ===== PIE DE PÁGINA EN TODAS LAS PÁGINAS =====

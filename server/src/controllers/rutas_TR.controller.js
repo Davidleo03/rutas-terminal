@@ -75,6 +75,19 @@ class RutasTRController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    static async downloadTripsByEmpresaPDF(req, res) {
+        const { id_empresa } = req.params;
+        try {
+            const rutasTR = await RutasTRModel.getRutasTRByEmpresa(id_empresa);
+            const buffer = await ReportGenerator.generateTripsPDF(rutasTR, { title: `Reporte - Rutas Tiempo Real - Empresa ${id_empresa}` });
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename="reporte_rutas_tr_empresa_${id_empresa}.pdf"`);
+            res.send(buffer);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 export default RutasTRController;
