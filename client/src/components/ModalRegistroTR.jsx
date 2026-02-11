@@ -51,6 +51,19 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
   const rutas = Array.isArray(rutasData) ? rutasData : [];
   const buses = Array.isArray(busesData) ? busesData : [];
 
+  
+  
+
+  // Mostrar solo rutas activas en el select del modal.
+  // Si estamos editando (`initialData`) permitimos incluir la ruta actual aunque esté inactiva
+  const activeRutas = rutas.filter((r) => {
+    
+    const isActive = r === null || r === undefined ? false : (r.activa === true || String(r.activa) === 'true' || String(r.activa) === '1');
+    if (isActive) return true;
+    if (initialData && String(initialData.id_ruta) === String(r.id_ruta)) return true;
+    return false;
+  });
+
   // Cuando cambie la ruta seleccionada en el form, actualizamos empresa_id
   // tomando la empresa que pertenece a esa ruta. Además, si el bus actualmente
   // seleccionado no pertenece a la empresa de la nueva ruta, lo limpiamos.
@@ -209,8 +222,7 @@ const ModalRegistroTR = ({ open, onClose, initialData = null, onSubmit, onDone }
             >
               <option value="">Seleccione una ruta</option>
               {isLoadingRutas && <option value="">Cargando rutas...</option>}
-              {rutas.map((r) => (
-                
+              {activeRutas.map((r) => (
                 <option key={r.id_ruta} value={String(r.id_ruta)}>{`${r.destino || r.nombre || 'Ruta ' + r.id_ruta} (ID ${r.id_ruta})`}</option>
               ))}
             </select>

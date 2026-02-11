@@ -4,6 +4,7 @@ import useRouteColors from './useRouteColors';
 
 export default function useRoutesFilter(initial = defaultRoutes) {
   const [rutasCargando] = useState(initial);
+  
 
   // Estados para filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState('');

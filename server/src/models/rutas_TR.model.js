@@ -4,9 +4,15 @@ class RutasTRModel {
     static async getAllRutasTR() {
         const { data, error } = await supabase
             .from('rutas_tiempo_real')
-            .select('*, ruta:rutas(*), bus:buses(*)');
+            // incluir la empresa relacionada dentro de la ruta para obtener tipo_ruta
+            .select('*, ruta:rutas(*, empresa:empresas(tipo_ruta, nombre_empresa)), bus:buses(*)');
         if (error) throw error;
-        return data;
+        // añadir campos raíz para facilitar el filtrado en frontend
+        return (data || []).map(d => ({
+            ...d,
+            tipo_ruta: d?.ruta?.empresa?.tipo_ruta ?? null,
+            nombre_empresa: d?.ruta?.empresa?.nombre_empresa ?? null,
+        }));
     }
 
     static async getRutasTRByEmpresa(id_empresa) {
@@ -24,21 +30,31 @@ class RutasTRModel {
         // Luego obtener las rutas en tiempo real cuya columna FK (id_ruta) esté en esos ids
         const { data, error } = await supabase
             .from('rutas_tiempo_real')
-            .select('*, ruta:rutas(*), bus:buses(*)')
+            // incluir la empresa relacionada dentro de la ruta para obtener tipo_ruta
+            .select('*, ruta:rutas(*, empresa:empresas(tipo_ruta, nombre_empresa)), bus:buses(*)')
             .in('id_ruta', rutaIds);
         if (error) throw error;
 
-        return data?.map(d => ({...d, nombre_empresa: rutas[0].nombre_empresa}));
+        return (data || []).map(d => ({
+            ...d,
+            tipo_ruta: d?.ruta?.empresa?.tipo_ruta ?? null,
+            // fallback: intentar obtener nombre desde la consulta previa a `rutas`
+            nombre_empresa: d?.ruta?.empresa?.nombre_empresa ?? rutas.find(r => r.id_ruta === d.id_ruta)?.empresa?.nombre_empresa ?? null,
+        }));
     }
 
     static async getRutaTRById(id) {
         const { data, error } = await supabase
             .from('rutas_tiempo_real')
-            .select('*')
+            .select('*, ruta:rutas(*, empresa:empresas(tipo_ruta, nombre_empresa)), bus:buses(*)')
             .eq('id', id)
             .single();
         if (error) throw error;
-        return data;
+        return {
+            ...data,
+            tipo_ruta: data?.ruta?.empresa?.tipo_ruta ?? null,
+            nombre_empresa: data?.ruta?.empresa?.nombre_empresa ?? null,
+        };
     }
 
     static async createRutaTR(rutaTR) {
@@ -46,7 +62,8 @@ class RutasTRModel {
         const { data, error } = await supabase
             .from('rutas_tiempo_real')
             .insert([rutaTR])
-            .select('*, ruta:rutas(*)')
+            // devolver también la ruta con su empresa para incluir tipo_ruta si es necesario
+            .select('*, ruta:rutas(*, empresa:empresas(tipo_ruta, nombre_empresa))')
             .single();
         
         if (error) throw error;
@@ -56,7 +73,11 @@ class RutasTRModel {
             .single();
         if (errorHistory) throw errorHistory;
 
-        return data;
+        return {
+            ...data,
+            tipo_ruta: data?.ruta?.empresa?.tipo_ruta ?? null,
+            nombre_empresa: data?.ruta?.empresa?.nombre_empresa ?? null,
+        };
     }
 
     static async updateRutaTR(id, rutaTR) {

@@ -70,7 +70,7 @@ const Dashboard = () => {
     totalRutas: rutas ? rutas.length : 0,
     totalBuses: buses ? buses.length : 0,
     busesDisponibles: busesDisponibles,
-    rutasActivas: rutas ? rutas.filter(r => r.estado === 'activa').length : 0,
+    rutasActivas: rutas ? rutas.filter(r => r.activa === true).length : 0,
     tiempoPromedio: calcAverageDuration(rutas)
   };
 

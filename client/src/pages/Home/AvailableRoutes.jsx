@@ -26,6 +26,8 @@ const AvailableRoutes = () => {
   // Rutas en tiempo real (prefiere estas si están disponibles)
   const { data: rutasTR = [], isLoading: isLoadingRutasTR, isError: isErrorRutasTR } = useRutasTR();
 
+  console.log('Rutas en tiempo real:', rutasTR);
+
   // Mapear las rutas en tiempo real al formato que esperan RoutesTable / MobileList
   const mapRutaTRToFlat = (tr) => ({
     id_ruta: tr?.id_registro ?? tr?.id ?? null,
@@ -39,9 +41,11 @@ const AvailableRoutes = () => {
     anden: tr?.anden ?? tr?.anden_nombre ?? '',
     horaSalida: tr?.horaSalida ?? tr?.hora_salida ?? tr?.hora ?? '',
     asientosDisponibles: tr?.asientos_disponibles ?? tr?.asientosDisponibles ?? tr?.asientos ?? 0,
-    empresa: tr?.ruta?.empresa_nombre ?? tr?.empresa ?? (tr?.ruta?.empresa || ''),
+  // Asegurarse de que `empresa` sea un string (nombre), no un objeto.
+  empresa: tr?.ruta?.empresa_nombre ?? tr?.empresa ?? tr?.ruta?.empresa?.nombre_empresa ?? (typeof tr?.ruta?.empresa === 'string' ? tr.ruta.empresa : ''),
     tipoBus: tr?.bus?.modelo ?? tr?.tipoBus ?? '',
     servicios: tr?.servicios ?? [],
+  tipo_ruta: tr?.tipo_ruta ?? tr?.ruta?.empresa?.tipo_ruta ?? '',
     bus : {
       capacidad: tr?.bus?.capacidad ?? tr?.capacidad ?? 0,
     },
@@ -55,9 +59,10 @@ const AvailableRoutes = () => {
     }(),
   });
 
-  const rutasParaMostrar = rutasTR?.map(mapRutaTRToFlat)
-  //console.log('Rutas TR mapeadas:', rutasParaMostrar);
-    
+  // Mostrar solo rutas cuya tipo_ruta === 'extra-urbana'
+  const rutasParaMostrar = rutasTR
+    ?.filter(tr => tr?.tipo_ruta === 'extra-urbana')
+    .map(mapRutaTRToFlat) || [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -84,7 +89,7 @@ const AvailableRoutes = () => {
           </div>
         </div>
 
-        {rutasFiltradas.length === 0 ? (
+        {rutasParaMostrar.length === 0 ? (
           <EmptyState limpiarFiltros={limpiarFiltros} />
         ) : (
           <>

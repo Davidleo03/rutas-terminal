@@ -12,10 +12,12 @@ const Table = () => {
   // Datos en el nuevo formato
   const routesData = rutas  || [];
 
+  //console.log('Rutas obtenidas:', routesData);
+
   
 
-  // Filtrar rutas según el tipo seleccionado
-  const datosActuales = routesData?.filter(ruta => ruta.empresa.tipo_ruta === tipoRuta) || [];
+  // Filtrar rutas según el tipo seleccionado y que estén activas
+  const datosActuales = routesData?.filter(ruta => (ruta.empresa?.tipo_ruta === tipoRuta) && (ruta.activa === true)) || [];
 
   // Eliminar duplicados por la combinación (destino, tipo_servicio)
   // Mantener la primera aparición de cada par. Ej: {Maracay, directo} y {Maracay, parada_corta}
