@@ -23,7 +23,7 @@ const Admin = () => {
   const busesDisponibles = buses ? buses.filter(bus => bus.activo).length : 0;
 
   const estadisticas = {
-    totalRutas: rutas.length, // Actualizado para usar el array de rutas
+    totalRutas: rutas?.length, // Actualizado para usar el array de rutas
     totalBuses: buses ? buses?.length : 0,
     busesDisponibles: busesDisponibles,
     ocupacionPromedio: 78,
