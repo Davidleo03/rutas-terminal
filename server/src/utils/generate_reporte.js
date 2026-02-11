@@ -1,112 +1,102 @@
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import supabase from '../config/supabase.js';
-import ReportGenerator from './ReportGenerator.js';
 
 /**
  * GenerateReporte
  * ----------
- * Clase responsable de: 1) consultar la tabla `historial_ruta` en Supabase
- * aplicando filtros enviados desde el frontend y 2) generar un PDF con
- * los resultados. El PDF tiene un diseño similar a `ReportGenerator.js`.
- *
- * Notas/Asunciones:
- * - La tabla `historial_ruta` contiene al menos los campos: id_historial, id_empresa, id_bus, hora_salida.
- * - Se hace INNER JOIN lógico a `empresas` y `buses` usando la convención de FK
- *   (igual que en otros modelos del proyecto). Si alguna propiedad de filtro
- *   no puede aplicarse en la consulta PostgREST, se aplica un filtrado adicional
- *   en memoria en el servidor (esto evita dependencias de SQL crudo).
- * - Filtros soportados: fecha_inicio, fecha_fin, destino, id_empresa, tipo_servicio, estado
+ * Clase corregida para manejar la pluralización de tablas y 
+ * relaciones anidadas entre rutas_tiempo_real, buses y empresas.
  */
 export default class GenerateReporte {
+  
   /**
-   * Construye y ejecuta la consulta a supabase aplicando filtros posibles en servidor.
-   * Luego aplica filtros adicionales en memoria cuando es necesario (destino, tipo_servicio, estado).
-   * Retorna un array de registros enriquecidos con `empresa` y `bus`.
+   * Consulta los datos enriquecidos.
    */
   static async fetchFilteredHistorial(filters = {}) {
-    const {
-      fecha_inicio,
-      fecha_fin,
-      destino,
-      id_empresa,
-      tipo_servicio,
-      estado
-    } = filters || {};
+    const { fecha_inicio, fecha_fin, id_empresa } = filters || {};
+
+    // Si hay filtros de fecha o empresa, usamos historial_rutas. 
+    // Si no, asumimos reporte de tiempo real.
+    const tieneFiltros = fecha_inicio || fecha_fin || id_empresa;
+    const tabla = tieneFiltros ? 'historial_rutas' : 'rutas_tiempo_real';
+
+    console.log('Generando reporte para tabla:', tabla, 'con filtros:', filters);
 
     try {
-      // Construir la consulta base. Usamos alias para traer la empresa y el bus
-      // asumiendo que las FK son `id_empresa` y `id_bus`.
-      let query = supabase
-        .from('historial_ruta')
-        .select('*, empresa:id_empresa(*), bus:id_bus(*)');
+      let query;
+      
+      if (tabla === 'rutas_tiempo_real') {
+        // Relación: rutas_tiempo_real -> buses -> empresas
+        // También traemos la ruta para obtener el destino
+        query = supabase
+          .from('rutas_tiempo_real')
+          .select(`
+            *,
+            bus:buses (
+              *,
+              empresa:empresas(*)
+            ),
+            ruta:rutas(*)
+          `);
+      } else {
+        // Relación: historial_rutas -> empresas, buses y rutas
+        query = supabase
+          .from('historial_rutas')
+          .select(`
+            *,
+            empresa:empresas(*),
+            bus:buses(*),
+            ruta:rutas(*)
+          `);
+      }
 
-      // Filtros que podemos aplicar directamente al PostgREST
-      if (id_empresa) query = query.eq('id_empresa', id_empresa);
+      // Filtros de base de datos
+      if (id_empresa && tabla === 'historial_rutas') {
+        query = query.eq('id_empresa', id_empresa);
+      }
 
-  if (fecha_inicio) query = query.gte('fecha_registro', fecha_inicio);
-  if (fecha_fin) query = query.lte('fecha_registro', fecha_fin);
-
-  // Orden por fecha_registro para reporte
-  query = query.order('fecha_registro', { ascending: true });
+      if (tabla === 'historial_rutas') {
+        if (fecha_inicio) query = query.gte('fecha_registro', fecha_inicio);
+        if (fecha_fin) query = query.lte('fecha_registro', fecha_fin);
+        query = query.order('fecha_registro', { ascending: true });
+      } else {
+        query = query.order('id_registro', { ascending: false });
+      }
 
       const { data, error } = await query;
       if (error) throw error;
 
       let rows = Array.isArray(data) ? data : [];
 
-      // Aplicar filtros adicionales en memoria cuando no hay garantía de columna
-      // (por ejemplo destino, tipo_servicio, estado). Buscamos candidatos en
-      // las entidades relacionadas (`empresa`, `bus`) para hacer un filtro flexible.
-      if (destino) {
-        const needle = String(destino).toLowerCase();
-        rows = rows.filter(r => {
-          const empresaDestino = r.empresa?.destino || r.empresa?.nombre || '';
-          return String(empresaDestino).toLowerCase().includes(needle);
-        });
+      // Filtrado en memoria para rutas_tiempo_real (relación indirecta)
+      if (id_empresa && tabla === 'rutas_tiempo_real') {
+        rows = rows.filter(r => r.bus?.empresa?.id_empresa === id_empresa);
       }
 
-      if (tipo_servicio) {
-        const needle = String(tipo_servicio).toLowerCase();
-        rows = rows.filter(r => {
-          // Try multiple places where tipo_servicio could be stored
-          const candidates = [r.bus?.tipo_servicio, r.empresa?.tipo_servicio, r.tipo_servicio];
-          return candidates.some(c => c && String(c).toLowerCase().includes(needle));
-        });
-      }
+      console.log(`Datos obtenidos: ${rows.length} registros.`);
 
-      if (estado) {
-        const needle = String(estado).toLowerCase();
-        rows = rows.filter(r => {
-          const candidates = [r.estado, r.bus?.estado, r.empresa?.estado];
-          return candidates.some(c => c && String(c).toLowerCase() === needle);
-        });
-      }
-
+      // Mapeo normalizado para el PDF
       return rows.map(r => ({
-        id_historial: r.id_historial ?? r.id ?? null,
-        id_empresa: r.id_empresa ?? (r.empresa && r.empresa.id_empresa) ?? null,
-        id_bus: r.id_bus ?? (r.bus && r.bus.id_bus) ?? null,
-        hora_salida: r.hora_salida ?? null,
-        empresa: r.empresa || null,
-        bus: r.bus || null,
+        id_display: r.id_historial || r.id_registro || '-',
+        empresa_nombre: r.empresa?.nombre_empresa || r.bus?.empresa?.nombre_empresa || 'N/A',
+        destino: r.ruta?.destino || '-',
+        bus_placa: r.bus?.placa || r.bus?.numero || '-',
+        hora: r.hora_salida || '-',
+        fecha: r.fecha_registro ? new Date(r.fecha_registro).toLocaleDateString('es-ES') : '-',
         raw: r
       }));
+
     } catch (err) {
-      throw new Error('Error al consultar historial_ruta: ' + (err.message || err));
+      throw new Error(`Error en fetchFilteredHistorial (${tabla}): ${err.message}`);
     }
   }
 
   /**
-   * Genera un PDF (Buffer) con los registros filtrados. Devuelve Buffer.
-   * options: permite personalizar colores u otros comportamientos.
+   * Genera el PDF con los datos normalizados.
    */
   static async generateFilteredPDF(filters = {}, options = {}) {
     const rows = await this.fetchFilteredHistorial(filters);
-
-    // Si se desea usar el ReportGenerator existente para un formato similar,
-    // podríamos mapear los campos al formato esperado. Aquí generamos un PDF
-    // simple y legible parecido al `ReportGenerator` pero adaptado a `historial_ruta`.
 
     return new Promise((resolve, reject) => {
       try {
@@ -115,74 +105,80 @@ export default class GenerateReporte {
         doc.on('data', chunk => chunks.push(chunk));
         doc.on('end', () => resolve(Buffer.concat(chunks)));
 
-        doc.font('Helvetica');
+        // Título y Metadatos
+        const tieneFiltros = filters.fecha_inicio || filters.fecha_fin || filters.id_empresa;
+        const titulo = tieneFiltros ? 'REPORTE - HISTORIAL DE RUTAS' : 'REPORTE - TIEMPO REAL';
+        
+        doc.fillColor('#2c3e50').fontSize(20).font('Helvetica-Bold').text(titulo, 50, 50);
+        doc.fontSize(10).font('Helvetica').fillColor('#7f8c8d')
+           .text(`Fecha de impresión: ${new Date().toLocaleString('es-ES')}`, 50, 80);
 
-        // Header
-        doc.fontSize(20).font('Helvetica-Bold').fillColor('black').text('Reporte - Historial de Rutas', 50, 50);
-        doc.fontSize(10).font('Helvetica').fillColor('#444444').text(`Generado: ${new Date().toLocaleString('es-ES')}`, 50, 85);
-        doc.moveTo(50, 105).lineTo(550, 105).strokeColor('#cccccc').lineWidth(1).stroke();
-        doc.y = 120;
+        // Línea divisoria
+        doc.moveTo(50, 100).lineTo(550, 100).strokeColor('#bdc3c7').lineWidth(1).stroke();
 
         if (!rows || rows.length === 0) {
-          doc.fontSize(12).fillColor('black').text('No hay datos para los filtros aplicados', { align: 'center' });
+          doc.moveDown(5);
+          doc.fillColor('#e74c3c').fontSize(14).text('No se encontraron registros para los filtros seleccionados.', { align: 'center' });
           doc.end();
           return;
         }
 
-        // Column positions
-        const colPos = { id: 50, empresa: 110, bus: 320, hora: 420 };
-        const colW = { id: 50, empresa: 200, bus: 90, hora: 80 };
+        // Configuración de Tabla
+        const tableTop = 130;
+        const colPos = { id: 50, destino: 100, empresa: 220, placa: 340, hora: 400, fecha: 460 };
+        const colW = { id: 40, destino: 110, empresa: 110, placa: 55, hora: 55, fecha: 50 };
 
-        // Header row
-        const headerY = doc.y;
-        doc.rect(50, headerY, 500, 28).fillColor('#e9e9e9').fill();
-        doc.fontSize(11).font('Helvetica-Bold').fillColor('#000000');
-        doc.text('ID', colPos.id, headerY + 8, { width: colW.id, align: 'center' });
-        doc.text('EMPRESA', colPos.empresa, headerY + 8, { width: colW.empresa, align: 'left' });
-        doc.text('BUS', colPos.bus, headerY + 8, { width: colW.bus, align: 'center' });
-        doc.text('HORA SALIDA', colPos.hora, headerY + 8, { width: colW.hora, align: 'center' });
-        doc.moveTo(50, headerY + 28).lineTo(550, headerY + 28).strokeColor('#999999').lineWidth(1).stroke();
-        doc.y = headerY + 35;
+        // Encabezado de Tabla
+        doc.rect(50, tableTop, 500, 25).fillColor('#34495e').fill();
+        doc.fontSize(10).font('Helvetica-Bold').fillColor('#ffffff');
+        doc.text('ID', colPos.id, tableTop + 7, { width: colW.id, align: 'center' });
+        doc.text('DESTINO', colPos.destino, tableTop + 7);
+        doc.text('EMPRESA', colPos.empresa, tableTop + 7);
+        doc.text('PLACA', colPos.placa, tableTop + 7, { width: colW.placa, align: 'center' });
+        doc.text('HORA', colPos.hora, tableTop + 7, { width: colW.hora, align: 'center' });
+        doc.text('FECHA', colPos.fecha, tableTop + 7, { width: colW.fecha, align: 'center' });
 
-        doc.fontSize(10).font('Helvetica').fillColor('#000000');
+        let currentY = tableTop + 25;
 
+        // Filas
         rows.forEach((r, idx) => {
-          if (doc.y > 700) {
+          // Salto de página automático
+          if (currentY > 750) {
             doc.addPage();
-            doc.y = 50;
+            currentY = 50;
+            // Re-dibujar encabezado en nueva página si se desea (opcional)
           }
 
+          // Fondo alterno para filas
           if (idx % 2 === 0) {
-            doc.rect(50, doc.y - 5, 500, 24).fillColor('#fbfbfb').fill();
+            doc.rect(50, currentY, 500, 20).fillColor('#f8f9fa').fill();
           }
 
-          const empresaName = r.empresa?.nombre || r.empresa?.razon_social || r.empresa?.nombre_empresa || '-';
-          const busPlaca = r.bus?.placa || r.bus?.numero || '-';
-    // Mostrar la fecha de registro (dentro del rango solicitado)
-    const fecha = r.fecha_registro ? new Date(r.fecha_registro).toLocaleString('es-ES') : '-';
+          doc.fillColor('#2c3e50').font('Helvetica').fontSize(9);
+          doc.text(String(r.id_display), colPos.id, currentY + 5, { width: colW.id, align: 'center' });
+          doc.text(r.destino, colPos.destino, currentY + 5, { width: colW.destino, ellipsis: true });
+          doc.text(r.empresa_nombre, colPos.empresa, currentY + 5, { width: colW.empresa, ellipsis: true });
+          doc.text(r.bus_placa, colPos.placa, currentY + 5, { width: colW.placa, align: 'center' });
+          doc.text(r.hora, colPos.hora, currentY + 5, { width: colW.hora, align: 'center' });
+          doc.text(r.fecha, colPos.fecha, currentY + 5, { width: colW.fecha, align: 'center' });
 
-          const rowY = doc.y;
-          doc.text(String(r.id_historial ?? '-'), colPos.id, rowY, { width: colW.id, align: 'center' });
-          doc.text(empresaName, colPos.empresa, rowY, { width: colW.empresa, align: 'left' });
-          doc.text(busPlaca, colPos.bus, rowY, { width: colW.bus, align: 'center' });
-          doc.text(fecha, colPos.hora, rowY, { width: colW.hora, align: 'center' });
-
-          doc.y = rowY + 24;
+          currentY += 20;
         });
 
-        // Summary
-        doc.moveDown(1);
-        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#cccccc').lineWidth(1).stroke();
-        doc.y += 10;
-        doc.fontSize(11).font('Helvetica-Bold').fillColor('#000000').text(`Total registros: ${rows.length}`, 50, doc.y);
+        // Resumen final
+        doc.moveDown(2);
+        doc.font('Helvetica-Bold').text(`Total de registros: ${rows.length}`, 50);
 
-        // Footer pages
+        // Numeración de páginas
         const pages = doc.bufferedPageRange();
         for (let i = 0; i < pages.count; i++) {
           doc.switchToPage(i);
-          const footerY = doc.page.height - 30;
-          doc.moveTo(50, footerY - 10).lineTo(550, footerY - 10).strokeColor('#cccccc').lineWidth(0.5).stroke();
-          doc.fontSize(9).font('Helvetica').fillColor('#666666').text(`Página ${i + 1} de ${pages.count}`, 50, footerY, { align: 'center', width: 500 });
+          doc.fontSize(8).fillColor('#95a5a6').text(
+            `Página ${i + 1} de ${pages.count}`,
+            50,
+            doc.page.height - 40,
+            { align: 'center', width: 500 }
+          );
         }
 
         doc.end();
@@ -196,4 +192,3 @@ export default class GenerateReporte {
     await fs.promises.writeFile(filePath, buffer);
   }
 }
-

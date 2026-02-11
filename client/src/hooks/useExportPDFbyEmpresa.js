@@ -1,30 +1,30 @@
 import { useState, useCallback } from 'react';
 import { API_BASE } from '../services/config';
 
-function buildQuery(filters = {}) {
-  const params = new URLSearchParams();
-  Object.entries(filters).forEach(([k, v]) => {
-    if (v !== null && typeof v !== 'undefined' && String(v).trim() !== '') {
-      params.append(k, v);
-    }
-  });
-  return params.toString();
-}
-
 export default function useExportPDFByEmpresa(id_empresa) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState(null);
 
   const download = useCallback(async (filters = {}, opts = {}) => {
-    const { endpoint = `/rutas_tiempo_real/report/pdf/${id_empresa}`, filenamePrefix = 'reporte_viajes' } = opts;
+    const { endpoint = '/reportes/pdf', filenamePrefix = 'reporte_viajes' } = opts;
     setError(null);
     setDownloading(true);
 
     try {
-      const qs = buildQuery(filters);
-      const url = `${API_BASE}${endpoint}${qs ? `?${qs}` : ''}`;
+      const url = `${API_BASE}${endpoint}`;
 
-      const res = await fetch(url, { method: 'GET' });
+      // Agregar id_empresa automáticamente a los filtros
+      const filtersWithEmpresa = {
+        ...filters,
+        id_empresa: id_empresa
+      };
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(filtersWithEmpresa)
+      });
+
       if (!res.ok) {
         const text = await res.text().catch(() => null);
         throw new Error(text || `Error ${res.status}`);
@@ -45,12 +45,12 @@ export default function useExportPDFByEmpresa(id_empresa) {
       setDownloading(false);
       return true;
     } catch (err) {
-      console.error('useExportPDF error:', err);
+      console.error('useExportPDFByEmpresa error:', err);
       setError(err);
       setDownloading(false);
       throw err;
     }
-  }, []);
+  }, [id_empresa]);
 
   return { download, downloading, error };
 }

@@ -16,15 +16,25 @@ export default function useExportPDF() {
   const [error, setError] = useState(null);
 
   const download = useCallback(async (filters = {}, opts = {}) => {
-    const { endpoint = '/rutas_tiempo_real/report/pdf', filenamePrefix = 'reporte_viajes' } = opts;
+    const { endpoint = '/reportes/pdf', filenamePrefix = 'reporte_viajes', method = 'POST' } = opts;
     setError(null);
     setDownloading(true);
 
     try {
-      const qs = buildQuery(filters);
-      const url = `${API_BASE}${endpoint}${qs ? `?${qs}` : ''}`;
+      const url = `${API_BASE}${endpoint}`;
 
-      const res = await fetch(url, { method: 'GET' });
+      let res;
+      if (method === 'POST') {
+        res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(filters)
+        });
+      } else {
+        const qs = buildQuery(filters);
+        res = await fetch(`${url}${qs ? `?${qs}` : ''}`, { method: 'GET' });
+      }
+
       if (!res.ok) {
         const text = await res.text().catch(() => null);
         throw new Error(text || `Error ${res.status}`);

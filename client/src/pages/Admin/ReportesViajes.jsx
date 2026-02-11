@@ -9,10 +9,7 @@ const ReportesViajes = () => {
   const [filtros, setFiltros] = useState({
     fechaInicio: '',
     fechaFin: '',
-    empresa: '',
-    tipoServicio: '',
-    estado: '',
-    destino: ''
+    empresa: ''
   });
   const { download, downloading, error } = useExportPDF();
   // Rutas en tiempo real (preview)
@@ -22,6 +19,37 @@ const ReportesViajes = () => {
 
   // Datos de ejemplo para empresas
   const { data: empresas = [] } = useEmpresas();
+
+  // Filtrar rutas en tiempo real según los filtros seleccionados
+  const rutasFiltradas = rutas.filter((trip) => {
+    let pasa = true;
+
+    // Filtro por fecha inicio
+    if (filtros.fechaInicio) {
+      const tripDate = trip.fecha_registro || trip.created_at || trip.ruta?.fecha_registro;
+      if (tripDate) {
+        const tripDateStr = new Date(tripDate).toISOString().split('T')[0];
+        pasa = pasa && tripDateStr >= filtros.fechaInicio;
+      }
+    }
+
+    // Filtro por fecha fin
+    if (filtros.fechaFin && pasa) {
+      const tripDate = trip.fecha_registro || trip.created_at || trip.ruta?.fecha_registro;
+      if (tripDate) {
+        const tripDateStr = new Date(tripDate).toISOString().split('T')[0];
+        pasa = pasa && tripDateStr <= filtros.fechaFin;
+      }
+    }
+
+    // Filtro por empresa
+    if (filtros.empresa && pasa) {
+      const empresaId = trip.ruta?.id_empresa || trip.bus?.empresa_id;
+      pasa = pasa && String(empresaId) === String(filtros.empresa);
+    }
+
+    return pasa;
+  });
 
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +66,13 @@ const ReportesViajes = () => {
 
   const handleExportarPDF = async () => {
     try {
-      await download(filtros, { filenamePrefix: 'reporte_viajes' });
+      // Mapear filtros al formato esperado por el backend
+      const backendFilters = {
+        ...(filtros.fechaInicio && { fecha_inicio: filtros.fechaInicio }),
+        ...(filtros.fechaFin && { fecha_fin: filtros.fechaFin }),
+        ...(filtros.empresa && { id_empresa: filtros.empresa })
+      };
+      await download(backendFilters, { filenamePrefix: 'reporte_viajes' });
     } catch (err) {
       // Puedes reemplazar con tu sistema de toasts
       alert('No se pudo generar el PDF. Revisa la consola para más detalles.');
@@ -54,10 +88,7 @@ const ReportesViajes = () => {
     setFiltros({
       fechaInicio: '',
       fechaFin: '',
-      empresa: '',
-      tipoServicio: '',
-      estado: '',
-      destino: ''
+      empresa: ''
     });
   };
 
@@ -81,18 +112,78 @@ const ReportesViajes = () => {
 
 
 
+      {/* Sección de Filtros */}
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Filtros del Reporte</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Fecha Inicio */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Inicio</label>
+            <input
+              type="date"
+              name="fechaInicio"
+              value={filtros.fechaInicio}
+              onChange={handleFiltroChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {/* Fecha Fin */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Fin</label>
+            <input
+              type="date"
+              name="fechaFin"
+              value={filtros.fechaFin}
+              onChange={handleFiltroChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {/* Empresa */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
+            <select
+              name="empresa"
+              value={filtros.empresa}
+              onChange={handleFiltroChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Todas las empresas</option>
+              {empresas.map((emp) => (
+                <option key={emp.id_empresa || emp.id} value={emp.id_empresa || emp.id}>
+                  {emp.nombre || emp.razon_social || emp.nombre_empresa || `Empresa ${emp.id_empresa || emp.id}`}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Botón Reset */}
+          <div className="flex items-end">
+            <button
+              onClick={handleResetFiltros}
+              className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            >
+              Limpiar Filtros
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Vista Previa del Reporte */}
       <div className="bg-white rounded-lg shadow p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-800">Vista Previa del Reporte</h2>
-          <div className="text-sm text-gray-500">
-            Datos generados: {new Date().toLocaleDateString('es-ES', {
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-500">
+              Mostrando <span className="font-medium text-gray-900">{rutasFiltradas.length}</span> de <span className="font-medium text-gray-900">{rutas.length}</span> registros
+            </div>
+            <div className="text-sm text-gray-500">
+              {new Date().toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </div>
           </div>
         </div>
 
@@ -128,12 +219,16 @@ const ReportesViajes = () => {
                 <tr>
                   <td colSpan={5} className="px-4 py-4 text-center text-sm text-red-500">Error al cargar rutas</td>
                 </tr>
-              ) : rutas.length === 0 ? (
+              ) : rutasFiltradas.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-4 text-center text-sm text-gray-500">No hay rutas disponibles</td>
+                  <td colSpan={5} className="px-4 py-4 text-center text-sm text-gray-500">
+                    {filtros.fechaInicio || filtros.fechaFin || filtros.empresa
+                      ? 'No hay rutas que coincidan con los filtros aplicados'
+                      : 'No hay rutas disponibles'}
+                  </td>
                 </tr>
               ) : (
-                rutas.map((trip) => {
+                rutasFiltradas.map((trip) => {
                   const idRuta = trip.id_ruta ?? trip.id_registro ?? '-';
                   const destino = trip.ruta?.destino || '-';
                   const precio = typeof trip.ruta?.precio !== 'undefined' && trip.ruta.precio !== null
