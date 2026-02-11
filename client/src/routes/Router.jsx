@@ -5,6 +5,8 @@ import adminRoutes from './admin'
 import adminEmpresaRoutes from './adminEmpresa'
 import NotFound from '../pages/NotFoud'
 import Login from '../pages/Auth/Login'
+import ForgotPassword from '../pages/Auth/ForgotPassword'
+import ResetPassword from '../pages/Auth/ResetPassword'
 
 const router = createBrowserRouter([
   ...homeRoutes,
@@ -19,6 +21,14 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />
   },
   ...adminRoutes,
   ...adminEmpresaRoutes,

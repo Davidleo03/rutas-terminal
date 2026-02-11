@@ -51,7 +51,37 @@ class AuthController {
             console.error('Error en el servidor:', error.message);
             res.status(500).json({ error: 'Error interno del servidor' });
         }
-    }   
+    }
+
+    static async forgotPassword(req, res) {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ error: 'Email requerido' });
+
+        try {
+            await AuthModel.sendPasswordResetEmail(email);
+            res.status(200).json({ message: 'Correo de recuperación enviado' });
+        } catch (error) {
+            console.error('Error sending reset email:', error.message);
+            // Don't reveal if user exists or not for security, or do if required. 
+            // Supabase returns 200 even if user doesn't exist usually.
+            res.status(400).json({ error: error.message });
+        }
+    }
+
+    static async resetPassword(req, res) {
+        const { email, token, newPassword } = req.body;
+        if (!email || !token || !newPassword) {
+            return res.status(400).json({ error: 'Faltan datos requeridos (email, token, password)' });
+        }
+
+        try {
+            await AuthModel.resetPasswordWithOtp(email, token, newPassword);
+            res.status(200).json({ message: 'Contraseña actualizada exitosamente' });
+        } catch (error) {
+            console.error('Error resetting password:', error.message);
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 
 export default AuthController;
