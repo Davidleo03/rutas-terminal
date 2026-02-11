@@ -24,7 +24,7 @@ const Admin = () => {
 
   const estadisticas = {
     totalRutas: rutas.length, // Actualizado para usar el array de rutas
-    totalBuses: buses ? buses.?length : 0,
+    totalBuses: buses ? buses?.length : 0,
     busesDisponibles: busesDisponibles,
     ocupacionPromedio: 78,
     
